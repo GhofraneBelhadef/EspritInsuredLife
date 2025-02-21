@@ -1,4 +1,7 @@
 package com.example.donationmanagement.repositories.RiskManagement;
 
-public interface RiskAssessmentRepository {
+import com.example.donationmanagement.entities.RiskManagement.RiskAssessment;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface RiskAssessmentRepository extends JpaRepository<RiskAssessment, Long> {
 }
