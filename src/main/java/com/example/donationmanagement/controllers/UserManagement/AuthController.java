@@ -6,6 +6,7 @@ import com.example.donationmanagement.services.UserManagement.IUserService;
 import com.example.donationmanagement.services.UserManagement.QRCodeService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -68,9 +69,14 @@ public class AuthController {
 
     // ✅ 2️⃣ Login
     @PostMapping("/login")
-    public String login(@RequestParam String email, @RequestParam String password) {
-        Optional<User> user = userService.login(email, password);
-        return user.map(value -> "Connexion réussie : " + value.getUsername()).orElse("Échec de connexion");
+    public ResponseEntity<?> login(@RequestParam String email, @RequestParam String password) {
+        Optional<String> token = userService.login(email, password);
+
+        if (token.isPresent()) {
+            return ResponseEntity.ok().body(Map.of("token", token.get()));
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Échec de connexion : email ou mot de passe incorrect");
+        }
     }
     @GetMapping("/test-email")
     public String testEmail() {

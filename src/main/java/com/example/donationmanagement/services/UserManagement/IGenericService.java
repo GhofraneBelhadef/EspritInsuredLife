@@ -1,5 +1,6 @@
 package com.example.donationmanagement.services.UserManagement;
 
+import com.example.donationmanagement.entities.UserManagement.User;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -12,4 +13,5 @@ public interface IGenericService<T, ID> {
     T update(ID id, T entity, MultipartFile photo, MultipartFile cin, MultipartFile justificatifDomicile,
              MultipartFile rib, MultipartFile bulletinSalaire, MultipartFile declarationSante, MultipartFile designationBeneficiaire, MultipartFile photoProfil);
     void delete(ID id);  // Supprimer
+    List<User> getAllDonors();
 }

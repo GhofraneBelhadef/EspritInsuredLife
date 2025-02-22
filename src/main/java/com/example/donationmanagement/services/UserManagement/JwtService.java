@@ -1,5 +1,6 @@
 package com.example.donationmanagement.services.UserManagement;
 
+import com.example.donationmanagement.entities.UserManagement.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -17,11 +18,12 @@ public class JwtService {
     private static final String SECRET_KEY = "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF";
 
     // Générer un token JWT pour un utilisateur
-    public String generateToken(String username) {
+    public String generateToken(User user) {
         return Jwts.builder()
-                .setSubject(username)
+                .setSubject(user.getEmail())  // Utilise l'email comme sujet
+                .claim("id", user.getId())    // Ajoute l'ID de l'utilisateur
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60)) // 1h
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60)) // Expiration 1h
                 .signWith(getSignKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
@@ -29,6 +31,14 @@ public class JwtService {
     // Récupérer l'username à partir du token
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
+    }
+    public Long extractUserId(String token) {
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(getSignKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+        return claims.get("id", Long.class);
     }
 
     // Vérifier si un token est valide
