@@ -1,8 +1,8 @@
 package com.example.donationmanagement.entities.DonationManagement;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import com.example.donationmanagement.entities.UserManagement.User;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -18,11 +18,19 @@ import java.util.List;
 @Entity
 public class DigitalWallet {
     @Id
-    private int id_digital_wallet;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long digital_wallet_id;
+
     private Double balance;
-    private int donor_id;
+
+    @ManyToOne
+    @JoinColumn(name = "donor_id")
+    private User donor; // Link to the donor (User entity)
+
+
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date last_update;
 
-    @OneToMany(mappedBy = "digital_wallet")
-    private List<WalletTransaction> WalletTransactions;
+    @OneToMany(mappedBy = "digital_wallet", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<WalletTransaction> walletTransactions; // Transactions made from this wallet
 }

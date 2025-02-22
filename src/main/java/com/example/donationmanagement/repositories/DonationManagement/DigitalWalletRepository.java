@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface DigitalWalletRepository extends JpaRepository<DigitalWallet, Integer> {
+    DigitalWallet findByDonor(int donor);
 }

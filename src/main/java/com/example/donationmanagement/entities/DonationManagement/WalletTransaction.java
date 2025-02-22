@@ -1,8 +1,7 @@
 package com.example.donationmanagement.entities.DonationManagement;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -17,16 +16,15 @@ import java.util.Date;
 @Entity
 public class WalletTransaction {
     @Id
-    private int id_transaction;
-    private int wallet_id;
-    private enum TransactionType{
-        Credit,
-        Debit
-    }
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long transaction_id;
 
-    private Double amount_transaction;
-    private Date date_transaction;
-    private String description;
+    private Double amount;
+
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private Date transaction_date;
+
     @ManyToOne
-    private DigitalWallet digital_wallet;
+    @JoinColumn(name = "digital_wallet_id")
+    private DigitalWallet digital_wallet; // Link to the digital wallet
 }

@@ -7,7 +7,7 @@ import java.util.List;
 
 
 public interface IDonationService {
-    Donation add(Donation donation);
+   /* Donation add(Donation donation);*/
     Donation update(Donation donation);
     void remove(Long id);
     Donation getById(Long id);
