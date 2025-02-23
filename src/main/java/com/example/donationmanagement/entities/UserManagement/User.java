@@ -1,5 +1,4 @@
 package com.example.donationmanagement.entities.UserManagement;
-import  com.example.donationmanagement.entities.UserManagement.Role;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
@@ -63,7 +62,7 @@ public class User {
 
 
     public enum Role {
-        CLIENT, ADMIN
+        CLIENT, ADMIN, DONOR
     }
 
     @Lob

@@ -3,6 +3,7 @@ package com.example.donationmanagement.services.UserManagement;
 import com.example.donationmanagement.entities.UserManagement.User;
 import com.example.donationmanagement.repositories.UserManagement.UserRepository;
 import jakarta.mail.MessagingException;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +26,8 @@ public class UserService implements IUserService {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private EmailService emailService;
+    @Autowired
+    private JwtService jwtService;
 
     // ✅ 1️⃣ Implémente `save(T entity)`
     @Override
@@ -96,9 +99,13 @@ public class UserService implements IUserService {
 
     // ✅ 3️⃣ Login
     @Override
-    public Optional<User> login(String email, String password) {
+    public Optional<String> login(String email, String password) {
         Optional<User> user = userRepository.findByEmail(email);
-        return user.filter(value -> passwordEncoder.matches(password, value.getPassword()));
+        if (user.isPresent() && passwordEncoder.matches(password, user.get().getPassword())) {
+            String token = jwtService.generateToken(user.get()); // ✅ Passe l'objet `User`
+            return Optional.of(token);
+        }
+        return Optional.empty();
     }
 
     // ✅ 4️⃣ CRUD hérité de `IGenericService`
@@ -113,40 +120,33 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public User update(Long id, User userDetails, MultipartFile photo, MultipartFile cin,
-                       MultipartFile justificatifDomicile, MultipartFile rib, MultipartFile bulletinSalaire,
-                       MultipartFile declarationSante, MultipartFile designationBeneficiaire, MultipartFile photoProfil) {
-        return userRepository.findById(id).map(user -> {
-            user.setNom(userDetails.getNom());
-            user.setPrenom(userDetails.getPrenom());
-            user.setEmail(userDetails.getEmail());
-            user.setUsername(userDetails.getUsername());
-            user.setTelephone(userDetails.getTelephone());
+    public User update(Long id, User updatedUser, MultipartFile photo, MultipartFile cin,
+                       MultipartFile justificatifDomicile, MultipartFile rib,
+                       MultipartFile bulletinSalaire, MultipartFile declarationSante,
+                       MultipartFile designationBeneficiaire, MultipartFile photoProfil) {
 
-            if (userDetails.getPassword() != null && !userDetails.getPassword().isEmpty()) {
-                user.setPassword(passwordEncoder.encode(userDetails.getPassword()));
-            }
+        User existingUser = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
 
-            user.setDateNaissance(userDetails.getDateNaissance());
-            user.setActive(userDetails.isActive());
-            user.setRole(userDetails.getRole());
+        // Mettre à jour les champs de l'utilisateur
+        existingUser.setUsername(updatedUser.getUsername());
+        existingUser.setEmail(updatedUser.getEmail());
+        existingUser.setTelephone(updatedUser.getTelephone());
 
-            // ✅ Mise à jour des fichiers uniquement s'ils sont envoyés
-            try {
-                if (photo != null && !photo.isEmpty()) user.setPhotoProfil(photo.getBytes());
-                if (cin != null && !cin.isEmpty()) user.setCin(cin.getBytes());
-                if (justificatifDomicile != null && !justificatifDomicile.isEmpty()) user.setJustificatifDomicile(justificatifDomicile.getBytes());
-                if (rib != null && !rib.isEmpty()) user.setRib(rib.getBytes());
-                if (bulletinSalaire != null && !bulletinSalaire.isEmpty()) user.setBulletinSalaire(bulletinSalaire.getBytes());
-                if (declarationSante != null && !declarationSante.isEmpty()) user.setDeclarationSante(declarationSante.getBytes());
-                if (designationBeneficiaire != null && !designationBeneficiaire.isEmpty()) user.setDesignationBeneficiaire(designationBeneficiaire.getBytes());
-                if (photoProfil != null && !photoProfil.isEmpty()) user.setPhotoProfil(photoProfil.getBytes());
-            } catch (IOException e) {
-                throw new RuntimeException("Erreur lors de la mise à jour des fichiers.");
-            }
+        try {
+            if (photo != null && !photo.isEmpty()) existingUser.setPhotoProfil(photo.getBytes());
+            if (cin != null && !cin.isEmpty()) existingUser.setCin(cin.getBytes());
+            if (justificatifDomicile != null && !justificatifDomicile.isEmpty()) existingUser.setJustificatifDomicile(justificatifDomicile.getBytes());
+            if (rib != null && !rib.isEmpty()) existingUser.setRib(rib.getBytes());
+            if (bulletinSalaire != null && !bulletinSalaire.isEmpty()) existingUser.setBulletinSalaire(bulletinSalaire.getBytes());
+            if (declarationSante != null && !declarationSante.isEmpty()) existingUser.setDeclarationSante(declarationSante.getBytes());
+            if (designationBeneficiaire != null && !designationBeneficiaire.isEmpty()) existingUser.setDesignationBeneficiaire(designationBeneficiaire.getBytes());
+            if (photoProfil != null && !photoProfil.isEmpty()) existingUser.setPhotoProfil(photoProfil.getBytes());
+        } catch (IOException e) {
+            throw new RuntimeException("Erreur lors du traitement des fichiers", e);
+        }
 
-            return userRepository.save(user);
-        }).orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
+        return userRepository.save(existingUser);
     }
 
     @Override
@@ -192,5 +192,23 @@ public class UserService implements IUserService {
         userRepository.save(user.get());
 
         return ResponseEntity.ok("Mot de passe réinitialisé avec succès !");
+    }
+    public Optional<User> getAuthenticatedUser(HttpServletRequest request) {
+        String token = extractToken(request);
+        if (token != null) {
+            Long userId = jwtService.extractUserId(token);
+            return userRepository.findById(userId); // Recherche l'utilisateur par ID
+        }
+        return Optional.empty();
+    }
+    public String extractToken(HttpServletRequest request) {
+        String authorizationHeader = request.getHeader("Authorization");
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            return authorizationHeader.substring(7); // Supprime "Bearer " pour ne garder que le token
+        }
+        return null;
+    }
+    public List<User> getAllDonors() {
+        return userRepository.findByRole(User.Role.DONOR);
     }
 }
