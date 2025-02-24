@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 
+import java.math.BigDecimal;
 import java.util.List;
 @Entity
 @Data
@@ -19,8 +20,8 @@ public class RiskAssessment {
     private Long UserId;
     @Enumerated(EnumType.STRING)
     private RiskType RiskType;
-    private double RiskScore;
-    private double Price;
+    private Double RiskScore;
+    private BigDecimal Price;
     @ManyToMany
     @JoinTable(
             name = "RiskA_RiskF",

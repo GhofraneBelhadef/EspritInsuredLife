@@ -1,4 +1,5 @@
 package com.example.donationmanagement.controllers.RiskManagement;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.example.donationmanagement.entities.RiskManagement.RiskAssessment;
 import com.example.donationmanagement.services.RiskManagement.RiskAssessmentService;
@@ -18,5 +19,10 @@ public class RiskAssessmentController {
     public String deleteAssessment(@PathVariable Long id) {
         RiskAssessmentService.deleteRiskAssessment(id);
         return "Risk Factor supprimé avec succès";
+    }
+    @PostMapping
+    public ResponseEntity<RiskAssessment> createRiskAssessment(@RequestBody Long UserId) {
+        RiskAssessment riskAssessment = RiskAssessmentService.createRiskAssessment(UserId);
+        return ResponseEntity.ok(riskAssessment);
     }
 }
