@@ -1,8 +1,7 @@
 package com.example.donationmanagement.entities.DonationManagement;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -17,16 +16,18 @@ import java.util.Date;
 @Entity
 public class Reward {
     @Id
-    private Long id_reward;
-    private int donation_id;
-    private Double reward_amount;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long reward_id;
 
+    private Double reward_amount;
     private String reward_type;
+
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date reward_date;
 
     private String description;
 
     @OneToOne
-    private Donation donation;
-
+    @JoinColumn(name = "donation_id")
+    private Donation donation; // Link to the donation
 }

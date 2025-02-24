@@ -1,5 +1,9 @@
 com\example\donationmanagement\services\RiskManagement\RiskAssessmentService.class
 com\example\donationmanagement\services\ContractManagement\IContractService.class
+<<<<<<< HEAD
+=======
+com\example\donationmanagement\entities\RiskManagement\RiskFactors$FactorType.class
+>>>>>>> 8f8724ce2a5d2234257dc13fc4ba0e25cb4d90a2
 com\example\donationmanagement\repositories\LoanManagement\LoanReposity.class
 com\example\donationmanagement\repositories\LoanManagement\RiskBreakdownRepository.class
 com\example\donationmanagement\repositories\ContractManagement\ContractRepository.class
@@ -15,8 +19,15 @@ com\example\donationmanagement\entities\UserManagement\User.class
 com\example\donationmanagement\controllers\UserManagement\AuthController.class
 com\example\donationmanagement\services\DonationManagement\IWalletTransactionService.class
 com\example\donationmanagement\services\ContractManagement\ContractHolderService.class
+<<<<<<< HEAD
 com\example\donationmanagement\controllers\ContractManagement\ContractController.class
 com\example\donationmanagement\repositories\ContractManagement\ContractAccountingRepository.class
+=======
+com\example\donationmanagement\entities\ContractManagement\Status.class
+com\example\donationmanagement\controllers\ContractManagement\ContractController.class
+com\example\donationmanagement\repositories\ContractManagement\ContractAccountingRepository.class
+com\example\donationmanagement\services\UserManagement\EmailService.class
+>>>>>>> 8f8724ce2a5d2234257dc13fc4ba0e25cb4d90a2
 com\example\donationmanagement\controllers\RiskManagement\RiskFactorsController.class
 com\example\donationmanagement\entities\DonationManagement\Donation$StatusDonation.class
 com\example\donationmanagement\repositories\ContractManagement\ContractHolderRepository.class
@@ -24,30 +35,62 @@ com\example\donationmanagement\repositories\DonationManagement\DigitalWalletRepo
 com\example\donationmanagement\services\ContractManagement\IContractAccountingService.class
 com\example\donationmanagement\repositories\RiskManagement\RiskFactorsRepository.class
 com\example\donationmanagement\entities\RiskManagement\RiskAssessment.class
+<<<<<<< HEAD
 com\example\donationmanagement\services\RiskManagement\IRiskAssessmentService.class
 com\example\donationmanagement\entities\ContractManagement\ContractHolder.class
 com\example\donationmanagement\services\UserManagement\IUserService.class
 com\example\donationmanagement\entities\ContractManagement\ContractAccounting.class
+=======
+com\example\donationmanagement\services\DonationManagement\ICampaignService.class
+com\example\donationmanagement\services\RiskManagement\IRiskAssessmentService.class
+com\example\donationmanagement\services\DonationManagement\CampaignService.class
+com\example\donationmanagement\controllers\DonationManagement\CampaignController.class
+com\example\donationmanagement\entities\ContractManagement\Category_contract.class
+com\example\donationmanagement\services\UserManagement\IUserService.class
+>>>>>>> 8f8724ce2a5d2234257dc13fc4ba0e25cb4d90a2
 com\example\donationmanagement\services\DonationManagement\DigitalWalletService.class
 com\example\donationmanagement\services\RiskManagement\RiskFactorsService.class
 com\example\donationmanagement\controllers\DonationManagement\DonationController.class
 com\example\donationmanagement\services\LoanManagement\CustomerService.class
 com\example\donationmanagement\services\UserManagement\IJwtService.class
+<<<<<<< HEAD
 com\example\donationmanagement\entities\ContractManagement\Contract.class
 com\example\donationmanagement\services\ContractManagement\IContractHolderService.class
 com\example\donationmanagement\entities\DonationManagement\DigitalWallet.class
 com\example\donationmanagement\controllers\ContractManagement\ContractHolderController.class
 com\example\donationmanagement\entities\LoanManagement\RiskBreakdown.class
 com\example\donationmanagement\entities\LoanManagement\Loan.class
+=======
+com\example\donationmanagement\entities\ContractManagement\Insurrance_Type.class
+com\example\donationmanagement\services\UserManagement\IGenericService.class
+com\example\donationmanagement\entities\ContractManagement\Contract.class
+com\example\donationmanagement\services\ContractManagement\IContractHolderService.class
+com\example\donationmanagement\entities\DonationManagement\DigitalWallet.class
+com\example\donationmanagement\repositories\DonationManagement\CampaignRepository.class
+com\example\donationmanagement\controllers\ContractManagement\ContractHolderController.class
+com\example\donationmanagement\entities\LoanManagement\RiskBreakdown.class
+com\example\donationmanagement\entities\LoanManagement\Loan.class
+com\example\donationmanagement\entities\ContractManagement\Contract_Accounting.class
+>>>>>>> 8f8724ce2a5d2234257dc13fc4ba0e25cb4d90a2
 com\example\donationmanagement\repositories\LoanManagement\CustomerRpository.class
 com\example\donationmanagement\controllers\LoanManagement\LoanController.class
 com\example\donationmanagement\services\LoanManagement\ICustomerService.class
 com\example\donationmanagement\services\ContractManagement\ContractService.class
+<<<<<<< HEAD
 com\example\donationmanagement\entities\DonationManagement\WalletTransaction$TransactionType.class
 com\example\donationmanagement\services\DonationManagement\IRewardService.class
 com\example\donationmanagement\entities\DonationManagement\Reward.class
 com\example\donationmanagement\controllers\DonationManagement\DigitalWalletController.class
 com\example\donationmanagement\controllers\DonationManagement\WalletTransactionController.class
+=======
+com\example\donationmanagement\entities\DonationManagement\Campaign.class
+com\example\donationmanagement\services\DonationManagement\IRewardService.class
+com\example\donationmanagement\services\UserManagement\CustomOAuth2UserService.class
+com\example\donationmanagement\entities\DonationManagement\Reward.class
+com\example\donationmanagement\controllers\DonationManagement\DigitalWalletController.class
+com\example\donationmanagement\controllers\DonationManagement\WalletTransactionController.class
+com\example\donationmanagement\entities\RiskManagement\RiskAssessment$RiskType.class
+>>>>>>> 8f8724ce2a5d2234257dc13fc4ba0e25cb4d90a2
 com\example\donationmanagement\repositories\DonationManagement\RewardRepository.class
 com\example\donationmanagement\services\LoanManagement\ILoanService.class
 com\example\donationmanagement\repositories\UserManagement\UserRepository.class
@@ -57,6 +100,10 @@ com\example\donationmanagement\controllers\LoanManagement\RiskBreakdownControlle
 com\example\donationmanagement\repositories\RiskManagement\RiskAssessmentRepository.class
 com\example\donationmanagement\services\DonationManagement\RewardService.class
 com\example\donationmanagement\DonationManagementApplication.class
+<<<<<<< HEAD
+=======
+com\example\donationmanagement\services\UserManagement\QRCodeService.class
+>>>>>>> 8f8724ce2a5d2234257dc13fc4ba0e25cb4d90a2
 com\example\donationmanagement\controllers\LoanManagement\CustomerController.class
 com\example\donationmanagement\services\LoanManagement\IRiskBreakdownService.class
 com\example\donationmanagement\services\DonationManagement\IDonationService.class
@@ -69,4 +116,10 @@ com\example\donationmanagement\entities\RiskManagement\RiskFactors.class
 com\example\donationmanagement\services\DonationManagement\DonationService.class
 com\example\donationmanagement\entities\DonationManagement\WalletTransaction.class
 com\example\donationmanagement\repositories\DonationManagement\DonationRepository.class
+<<<<<<< HEAD
 com\example\donationmanagement\repositories\DonationManagement\WalletTransactionRepository.class
+=======
+com\example\donationmanagement\entities\UserManagement\User$Role.class
+com\example\donationmanagement\repositories\DonationManagement\WalletTransactionRepository.class
+com\example\donationmanagement\entities\UserManagement\Role.class
+>>>>>>> 8f8724ce2a5d2234257dc13fc4ba0e25cb4d90a2

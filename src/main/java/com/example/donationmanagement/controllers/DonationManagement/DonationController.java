@@ -13,11 +13,11 @@ public class DonationController {
 
     @Autowired
     private IDonationService donationService;
-
+/*
     @PostMapping("/add")
     public Donation addDonation(@RequestBody Donation donation) {
         return donationService.add(donation);
-    }
+    }*/
 
     @PutMapping("/update")
     public Donation updateDonation(@RequestBody Donation donation) {

@@ -8,9 +8,9 @@ import java.util.List;
 
 public interface IDigitalWalletService {
     DigitalWallet add(DigitalWallet digitalWallet);
-
+/*
     DigitalWallet update(DigitalWallet digitalWallet);
-
+*/
     void remove(int id);
 
     DigitalWallet getById(int id);
