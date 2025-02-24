@@ -1,19 +1,16 @@
-/*
 package com.example.donationmanagement.entities.ContractManagement;
-
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-@Table(name="contract_holder")
 @ToString
 @Setter
 @Getter
 @NoArgsConstructor
 @Entity
-public class Contract_Holder {
+public class ContractHolder {
     public enum Holder_Type {
         Primary , Secondary
     }
@@ -36,4 +33,3 @@ public class Contract_Holder {
 
 
 }
-*/
