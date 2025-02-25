@@ -62,7 +62,7 @@ public class User {
 
 
     public enum Role {
-        CLIENT, ADMIN
+        CLIENT, ADMIN, DONOR
     }
 
     @Lob

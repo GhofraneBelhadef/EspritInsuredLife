@@ -4,6 +4,7 @@ import com.example.donationmanagement.entities.UserManagement.User;
 import com.example.donationmanagement.repositories.UserManagement.UserRepository;
 import com.example.donationmanagement.services.UserManagement.IUserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,25 +39,44 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public User updateUser(
-            @PathVariable Long id,
-            @RequestPart("user") String userJson,
-            @RequestPart(value = "photo", required = false) MultipartFile photo,
-            @RequestPart(value = "cin", required = false) MultipartFile cin,
-            @RequestPart(value = "justificatifDomicile", required = false) MultipartFile justificatifDomicile,
-            @RequestPart(value = "rib", required = false) MultipartFile rib,
-            @RequestPart(value = "bulletinSalaire", required = false) MultipartFile bulletinSalaire,
-            @RequestPart(value = "declarationSante", required = false) MultipartFile declarationSante,
-            @RequestPart(value = "designationBeneficiaire", required = false) MultipartFile designationBeneficiaire,
-            @RequestPart(value = "photoProfil", required = false) MultipartFile photoProfil
-    ) throws IOException {
-        User userDetails = objectMapper.readValue(userJson, User.class);
-        return userService.update(id, userDetails, photo, cin, justificatifDomicile, rib, bulletinSalaire, declarationSante, designationBeneficiaire,photoProfil);
+    public ResponseEntity<?> updateUser(@PathVariable Long id,
+                                        @RequestBody User updatedUser,
+                                        HttpServletRequest request,
+                                        @RequestParam(value = "photo", required = false) MultipartFile photo,
+                                        @RequestParam(value = "cin", required = false) MultipartFile cin,
+                                        @RequestParam(value = "justificatifDomicile", required = false) MultipartFile justificatifDomicile,
+                                        @RequestParam(value = "rib", required = false) MultipartFile rib,
+                                        @RequestParam(value = "bulletinSalaire", required = false) MultipartFile bulletinSalaire,
+                                        @RequestParam(value = "declarationSante", required = false) MultipartFile declarationSante,
+                                        @RequestParam(value = "designationBeneficiaire", required = false) MultipartFile designationBeneficiaire,
+                                        @RequestParam(value = "photoProfil", required = false) MultipartFile photoProfil) {
+
+        Optional<User> authenticatedUser = userService.getAuthenticatedUser(request);
+
+        if (authenticatedUser.isPresent() && authenticatedUser.get().getId().equals(id)) {
+            return ResponseEntity.ok(userService.update(id, updatedUser, photo, cin, justificatifDomicile, rib, bulletinSalaire, declarationSante, designationBeneficiaire, photoProfil));
+        } else {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Accès refusé !");
+        }
     }
 
     @DeleteMapping("/{id}")
-    public void deleteUser(@PathVariable Long id) {
-        userService.delete(id);
+    public ResponseEntity<?> deleteUser(@PathVariable Long id, HttpServletRequest request) {
+        Optional<User> authenticatedUser = userService.getAuthenticatedUser(request);
+
+        if (authenticatedUser.isPresent()) {
+            User user = authenticatedUser.get();
+
+            // Vérifie si l'utilisateur est ADMIN ou s'il essaie de supprimer son propre compte
+            if (user.getRole().equals("ADMIN") || user.getId().equals(id)) {
+                userService.delete(id);
+                return ResponseEntity.ok().body("Utilisateur supprimé avec succès !");
+            } else {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Accès refusé !");
+            }
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Utilisateur non authentifié !");
+        }
     }
     @PutMapping("/complete-profile/{email}")
     public ResponseEntity<String> completeUserProfile(
@@ -96,6 +116,10 @@ public class UserController {
         userRepository.save(user);
 
         return ResponseEntity.ok("Profil complété avec succès !");
+    }
+    @GetMapping("/donors")
+    public ResponseEntity<List<User>> getAllDonors() {
+        return ResponseEntity.ok(userService.getAllDonors());
     }
 
 

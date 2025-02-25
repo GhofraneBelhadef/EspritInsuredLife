@@ -1,17 +1,14 @@
 package com.example.donationmanagement.services.UserManagement;
 
-
 import com.example.donationmanagement.entities.UserManagement.User;
 import com.example.donationmanagement.repositories.UserManagement.UserRepository;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
-import java.util.Collections;
+
 import java.util.Optional;
 
 
