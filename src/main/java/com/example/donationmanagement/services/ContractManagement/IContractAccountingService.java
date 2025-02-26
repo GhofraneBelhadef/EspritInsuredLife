@@ -7,12 +7,16 @@ import java.util.List;
 public interface IContractAccountingService {
     ContractAccounting add(ContractAccounting contractaccounting);
 
-    /*Contract_Accounting updateTotalCapital(int matriculeFiscale);*/
+    ContractAccounting updateTotalCapital(int matriculeFiscale);
 
-    /*Contract_Accounting updateIndemnitesVersees(int matriculeFiscale, float montant);*/
+    ContractAccounting updateIndemnitesVersees(int matriculeFiscale);
 
-    /* float getProfit(int matriculeFiscale);*/
+     float getProfit(int matriculeFiscale);
     List<ContractAccounting> getAll();
     ContractAccounting getById(long id);
     ContractAccounting update(ContractAccounting contract_accounting);
+    float calculerBenefice(int matriculeFiscale); // ✅ Vérifie bien ce type de retour
+    float calculerBeneficeTotal();
+
+
 }

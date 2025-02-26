@@ -7,8 +7,7 @@ import lombok.Setter;
 import lombok.ToString;
 import java.util.Date;
 import java.util.Set;
-
-@ToString
+@ToString(exclude = {"contractAccounting", "contract_holders"})
 @Setter
 @Getter
 @NoArgsConstructor
@@ -40,11 +39,10 @@ public class Contract {
     @Enumerated(EnumType.STRING)
     private  Status status;
     @OneToMany (cascade = CascadeType.ALL, mappedBy = "contract")
-
     private Set<ContractHolder> contract_holders;
     @ManyToOne
     @JoinColumn(name = "contract_accounting_id")
-    ContractAccounting contract_accounting;
+    ContractAccounting contractAccounting;
 
 
 

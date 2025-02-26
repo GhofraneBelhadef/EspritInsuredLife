@@ -4,31 +4,117 @@ import com.example.donationmanagement.entities.ContractManagement.ContractAccoun
 import com.example.donationmanagement.services.ContractManagement.IContractAccountingService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.List;
 
 @Tag(name = "Gestion ContractAccounting")
 @RestController
 @RequestMapping("/contractAccounting")
 public class ContractAccountingController {
+    private static final Logger log = LoggerFactory.getLogger(ContractAccountingController.class);
     @Autowired
     private IContractAccountingService contractAccountingService;
+
+    /**
+     * 🔹 Ajoute un ContractAccounting (⚠️ Vérifier si nécessaire).
+     */
     @PostMapping("/add")
-    public ContractAccounting add(@RequestBody ContractAccounting contractAccounting) {
-        return contractAccountingService.add(contractAccounting);
+    public ResponseEntity<ContractAccounting> add(@RequestBody ContractAccounting contractAccounting) {
+        if (contractAccounting.getMatriculeFiscale() == 0) {
+            return ResponseEntity.badRequest().build();
+        }
+        ContractAccounting savedAccounting = contractAccountingService.add(contractAccounting);
+        return ResponseEntity.ok(savedAccounting);
     }
 
+    /**
+     * 🔹 Récupère tous les ContractAccounting.
+     */
     @GetMapping("/all")
-    public List<ContractAccounting> getAllContractAccounting() {
-        return contractAccountingService.getAll();
+    public ResponseEntity<List<ContractAccounting>> getAllContractAccounting() {
+        List<ContractAccounting> accountings = contractAccountingService.getAll();
+        return ResponseEntity.ok(accountings);
     }
+
+    /**
+     * 🔹 Mise à jour d'un ContractAccounting existant.
+     */
     @PutMapping("/update/{id}")
-    public ContractAccounting updateContractAccounting(@RequestBody ContractAccounting contract_accounting) {
-        return contractAccountingService.update(contract_accounting);
+    public ResponseEntity<ContractAccounting> updateContractAccounting(
+            @PathVariable long id,
+            @RequestBody ContractAccounting contractAccounting) {
+
+        ContractAccounting existingAccounting = contractAccountingService.getById(id);
+        if (existingAccounting == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        contractAccounting.setContract_accounting_id(id);
+        ContractAccounting updatedAccounting = contractAccountingService.update(contractAccounting);
+        return ResponseEntity.ok(updatedAccounting);
     }
+
+    /**
+     * 🔹 Récupère un ContractAccounting par son ID.
+     */
     @GetMapping("/{id}")
-    public ContractAccounting getContractAccountingById(@PathVariable long id) {
-        return contractAccountingService.getById(id);
+    public ResponseEntity<ContractAccounting> getContractAccountingById(@PathVariable long id) {
+        ContractAccounting accounting = contractAccountingService.getById(id);
+        return (accounting != null) ? ResponseEntity.ok(accounting) : ResponseEntity.notFound().build();
+    }
+
+    /**
+     * 🔹 Met à jour le total capital pour un matricule fiscal donné.
+     */
+    @PutMapping("/update-total-capital/{matriculeFiscale}")
+    public ResponseEntity<ContractAccounting> updateTotalCapital(@PathVariable int matriculeFiscale) {
+        try {
+            ContractAccounting updatedAccounting = contractAccountingService.updateTotalCapital(matriculeFiscale);
+            return ResponseEntity.ok(updatedAccounting);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    /**
+     * 🔹 Met à jour les indemnités versées pour un matricule fiscal donné.
+     */
+    @PutMapping("/update-indemnites/{matriculeFiscale}")
+    public ResponseEntity<ContractAccounting> updateIndemnitesVersees(@PathVariable int matriculeFiscale) {
+        log.info(" Requête reçue pour mise à jour des indemnités matricule : {}", matriculeFiscale);
+        try {
+            ContractAccounting updatedAccounting = contractAccountingService.updateIndemnitesVersees(matriculeFiscale);
+            return ResponseEntity.ok(updatedAccounting);
+        } catch (RuntimeException e) {
+            log.error(" Erreur : {}", e.getMessage());
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+
+    /**
+     * 🔹 Calcule le profit pour un matricule fiscal donné.
+     */
+    @GetMapping("/profit/{matriculeFiscale}")
+    public ResponseEntity<Float> getProfit(@PathVariable int matriculeFiscale) {
+        float profit = contractAccountingService.getProfit(matriculeFiscale);
+        return ResponseEntity.ok(profit);
+    }
+    @GetMapping("/benefice/{matriculeFiscale}")
+    public ResponseEntity<Float> getBenefice(@PathVariable int matriculeFiscale) {
+        float benefice = contractAccountingService.calculerBenefice(matriculeFiscale);
+        return ResponseEntity.ok(benefice);
+    }
+
+    /**
+     * 🔹 Calcul du bénéfice total des assurances.
+     */
+    @GetMapping("/benefice-total")
+    public ResponseEntity<Float> getBeneficeTotal() {
+        float beneficeTotal = contractAccountingService.calculerBeneficeTotal();
+        return ResponseEntity.ok(beneficeTotal);
     }
 }
