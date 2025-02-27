@@ -32,15 +32,19 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable()) // Désactiver CSRF pour API REST
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**", "/oauth2/**").permitAll() // Routes accessibles sans authentification
+                        .requestMatchers("/api/auth/**", "/oauth2/**").permitAll() // Routes publiques
                         .anyRequest().authenticated() // Toutes les autres requêtes nécessitent un token
                 )
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Désactiver la gestion de session
-                .oauth2Login(oauth2 -> oauth2.defaultSuccessUrl("/api/auth/success", true)) // OAuth2 login success
-                .logout(logout -> logout.logoutSuccessHandler(oidcLogoutSuccessHandler(clientRegistrationRepository))) // Logout
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class) // Ajouter le filtre JWT
-
-                // 📌 GESTION DES ERREURS : Désactiver la redirection vers une page HTML et forcer JSON
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)) // ✅ Permettre une session OAuth2
+                .oauth2Login(oauth2 -> oauth2
+                        .defaultSuccessUrl("/api/auth/success", true) // ✅ Rediriger après login Google
+                )
+                .logout(logout -> logout
+                        .logoutSuccessHandler(oidcLogoutSuccessHandler(clientRegistrationRepository))
+                        .invalidateHttpSession(true)
+                        .clearAuthentication(true)
+                )
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class) // ✅ Ajout du filtre JWT
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint((request, response, authException) -> {
                             response.setContentType("application/json");
@@ -56,6 +60,7 @@ public class SecurityConfig {
 
         return http.build();
     }
+
 
     @Bean
     public LogoutSuccessHandler oidcLogoutSuccessHandler(ClientRegistrationRepository clientRegistrationRepository) {

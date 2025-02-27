@@ -1,8 +1,10 @@
 package com.example.donationmanagement.controllers.UserManagement;
 
 import com.example.donationmanagement.entities.UserManagement.User;
+import com.example.donationmanagement.repositories.UserManagement.UserRepository;
 import com.example.donationmanagement.services.UserManagement.EmailService;
 import com.example.donationmanagement.services.UserManagement.IUserService;
+import com.example.donationmanagement.services.UserManagement.JwtService;
 import com.example.donationmanagement.services.UserManagement.QRCodeService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.ConstraintViolation;
@@ -11,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -147,10 +150,40 @@ public class AuthController {
             return ResponseEntity.status(401).body("⛔ QR Code invalide ou expiré");
         }
     }
+    @Autowired
+    private JwtService jwtService;
+
+    @Autowired
+    private UserRepository userRepository;
     @GetMapping("/success")
-    public Map<String, Object> getUserInfo(@AuthenticationPrincipal OAuth2User principal) {
-        return principal.getAttributes(); // Retourne les infos de l'utilisateur
+    public ResponseEntity<?> getUserInfo(OAuth2AuthenticationToken authenticationToken) {
+        if (authenticationToken == null || authenticationToken.getPrincipal() == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "Utilisateur non authentifié après OAuth2 !"));
+        }
+
+        OAuth2User oAuth2User = authenticationToken.getPrincipal();
+        String googleId = oAuth2User.getAttribute("sub");
+        String email = oAuth2User.getAttribute("email");
+
+        Optional<User> existingUser = userRepository.findByGoogleId(googleId);
+
+        if (existingUser.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "Utilisateur non trouvé après OAuth2 !"));
+        }
+
+        User user = existingUser.get();
+
+        // ✅ Générer le Token JWT sans le stocker
+        String jwtToken = jwtService.generateToken(user);
+
+        return ResponseEntity.ok(Map.of(
+                "token", jwtToken,
+                "user", oAuth2User.getAttributes()
+        ));
     }
+
 
 
 }
