@@ -1,6 +1,7 @@
 package com.example.donationmanagement.entities.RiskManagement;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -17,8 +18,10 @@ public class RiskFactors {
     private Long RiskFactorsId;
     @Enumerated(EnumType.STRING)
     private FactorType FactorType;
-    private Double FactorValue;
+    private int FactorValue;
     private String Description;
     @ManyToMany(mappedBy = "RiskFactors")
+    @JsonIgnore
     private List<RiskAssessment> RiskAssessments;
 }
+

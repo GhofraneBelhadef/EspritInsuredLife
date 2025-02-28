@@ -5,11 +5,12 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 
+
 import java.math.BigDecimal;
+
 import java.util.List;
 @Entity
 @Data
-
 public class RiskAssessment {
     public enum RiskType {
         High, Medium, Low
@@ -20,7 +21,7 @@ public class RiskAssessment {
     private Long UserId;
     @Enumerated(EnumType.STRING)
     private RiskType RiskType;
-    private Double RiskScore;
+    private Double RiskScore = 0.0;
     private BigDecimal Price;
     @ManyToMany
     @JoinTable(
@@ -29,4 +30,6 @@ public class RiskAssessment {
             inverseJoinColumns = @JoinColumn(name = "idFactor")
     )
     private List<RiskFactors> RiskFactors;
+
 }
+

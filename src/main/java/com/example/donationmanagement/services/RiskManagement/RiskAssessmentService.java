@@ -1,6 +1,7 @@
 package com.example.donationmanagement.services.RiskManagement;
 import com.example.donationmanagement.controllers.RiskManagement.RiskAssessmentController;
 import com.example.donationmanagement.entities.RiskManagement.RiskAssessment;
+import com.example.donationmanagement.entities.RiskManagement.RiskFactors;
 import com.example.donationmanagement.repositories.RiskManagement.RiskFactorsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -8,69 +9,138 @@ import com.example.donationmanagement.repositories.RiskManagement.RiskAssessment
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class RiskAssessmentService implements IRiskAssessmentService {
+
+    private final RiskAssessmentRepository riskAssessmentRepository;
+    private final RiskFactorsRepository riskFactorsRepository;
     @Autowired
-    private RiskAssessmentRepository RiskAssessmentRepository;
+    private RiskFactorHistoryService riskFactorHistoryService;
+    @Autowired
+    public RiskAssessmentService(RiskAssessmentRepository riskAssessmentRepository,
+                                 RiskFactorsRepository riskFactorsRepository) {
+        this.riskAssessmentRepository = riskAssessmentRepository;
+        this.riskFactorsRepository = riskFactorsRepository; // ✅ Initialisation correcte
+    }
+    public RiskAssessment getRiskAssessmentById(Long riskAssessmentId) {
+        return riskAssessmentRepository.findById(riskAssessmentId)
+                .orElseThrow(() -> new RuntimeException("RiskAssessment non trouvé avec ID : " + riskAssessmentId));
+    }
+
 
     public List<RiskAssessment> getAllRiskAssessments() {
-        return RiskAssessmentRepository.findAll();
+        return riskAssessmentRepository.findAll();
     }
-    public void deleteRiskAssessment(Long RiskAssessmentId) {
-        if (RiskAssessmentRepository.existsById(RiskAssessmentId)) {
-            RiskAssessmentRepository.deleteById(RiskAssessmentId);
+
+    public void deleteRiskAssessment(Long riskAssessmentId) {
+        if (riskAssessmentRepository.existsById(riskAssessmentId)) {
+            riskAssessmentRepository.deleteById(riskAssessmentId);
         } else {
-            throw new RuntimeException("Risk Factor not found with ID: " + RiskAssessmentId);
+            throw new RuntimeException("Risk Factor not found with ID: " + riskAssessmentId);
         }
     }
-        @Transactional // S'assure que la mise à jour est bien effectuée
-        public Double calculateRiskScore(Long RiskAssessmentId) {
-            Optional<RiskAssessment> riskAssessmentOpt = RiskAssessmentRepository.findById(RiskAssessmentId);
-            if (riskAssessmentOpt.isPresent()) {
-                RiskAssessment riskAssessment = riskAssessmentOpt.get();
-                // 🔹 Calcul du Risk Score
-                Double RiskScore = Math.random() * 100; // Exemple : entre 0 et 100
-                // 🔹 Mise à jour automatique du Risk Score
-                riskAssessment.setRiskScore(RiskScore);
-                RiskAssessmentRepository.save(riskAssessment);  // Sauvegarde automatique
-                return RiskScore;
-            }
-            throw new RuntimeException("RiskAssessment non trouvé !");
+
+    @Transactional
+    public Double calculateRiskScore(Long riskAssessmentId) {
+        Optional<RiskAssessment> riskAssessmentOpt = riskAssessmentRepository.findById(riskAssessmentId);
+        if (riskAssessmentOpt.isPresent()) {
+            RiskAssessment riskAssessment = riskAssessmentOpt.get();
+            Double oldRiskScore = riskAssessment.getRiskScore(); // 🔹 Récupérer l'ancien score
+
+            // 🔹 Calcul du Risk Score
+            Double newRiskScore = (double) riskAssessment.getRiskFactors().stream()
+                    .mapToInt(RiskFactors::getFactorValue)
+                    .sum();
+
+            riskAssessment.setRiskScore(newRiskScore);
+            riskAssessmentRepository.save(riskAssessment);
+
+            // 🔹 Enregistrer la modification dans RiskFactorHistory
+            riskFactorHistoryService.addRiskFactorHistory(
+                    riskAssessment.getAssessmentId(),
+                    null, // Pas un facteur de risque spécifique
+                    newRiskScore.intValue(), // Nouvelle valeur
+                    "Mise à jour automatique du RiskScore"
+            );
+
+            return newRiskScore;
         }
+        throw new RuntimeException("RiskAssessment non trouvé !");
+    }
+
+
     @Transactional
     public BigDecimal calculatePrice(Long riskAssessmentId) {
-        Optional<RiskAssessment> riskAssessmentOpt = RiskAssessmentRepository.findById(riskAssessmentId);
+        Optional<RiskAssessment> riskAssessmentOpt = riskAssessmentRepository.findById(riskAssessmentId);
 
         if (riskAssessmentOpt.isPresent()) {
             RiskAssessment riskAssessment = riskAssessmentOpt.get();
+
             // 🔹 Vérifier que le Risk Score est déjà calculé
             if (riskAssessment.getRiskScore() == null) {
                 throw new RuntimeException("Risk Score non encore calculé !");
             }
-            // 🔹 Calcul automatique du prix
-            BigDecimal Price = BigDecimal.valueOf(riskAssessment.getRiskScore() * 10); // Exemple : 10 unités monétaires par point
-            // 🔹 Mise à jour automatique du Prix
-            riskAssessment.setPrice(Price);
-            RiskAssessmentRepository.save(riskAssessment);  // Sauvegarde automatique
-            return Price;
+
+            // 🔹 Calcul du prix
+            BigDecimal price = BigDecimal.valueOf(((riskAssessment.getRiskScore() * 0.03)+1)*100)
+                    .setScale(2, RoundingMode.HALF_UP);
+
+            // 🔹 Mise à jour et sauvegarde
+            riskAssessment.setPrice(price);
+            return riskAssessmentRepository.save(riskAssessment).getPrice();
         }
         throw new RuntimeException("RiskAssessment non trouvé !");
     }
+
     @Transactional
-    public RiskAssessment createRiskAssessment(Long UserId) {
-        RiskAssessment RiskAssessment = new RiskAssessment();
-        RiskAssessment.setUserId(UserId);
-        // 🔹 Sauvegarde initiale sans Risk Score ni Prix
-        RiskAssessment = RiskAssessmentRepository.save(RiskAssessment);
+    public RiskAssessment createRiskAssessment(Long userId, List<Long> riskFactorIds) {
+        RiskAssessment riskAssessment = new RiskAssessment();
+        riskAssessment.setUserId(userId);
+
+        // 🔹 Récupération des RiskFactors à partir des IDs fournis
+        List<RiskFactors> riskFactors = riskFactorsRepository.findAllById(riskFactorIds);
+        riskAssessment.setRiskFactors(riskFactors);
+
+        // 🔹 Sauvegarde initiale
+        riskAssessment = riskAssessmentRepository.save(riskAssessment);
+
         // 🔹 Calcul et mise à jour automatique
-        Double riskScore = calculateRiskScore(RiskAssessment.getAssessmentId());
-        BigDecimal price = calculatePrice(RiskAssessment.getAssessmentId());
+        calculateRiskScore(riskAssessment.getAssessmentId());
+        calculatePrice(riskAssessment.getAssessmentId());
 
-        return RiskAssessment;  // Retourne l'objet mis à jour
+        return riskAssessmentRepository.findById(riskAssessment.getAssessmentId()).orElseThrow();
     }
+    @Transactional
+    public RiskAssessment updateRiskAssessment(Long riskAssessmentId, List<Long> addRiskFactorIds, List<Long> removeRiskFactorIds) {
+        RiskAssessment riskAssessment = riskAssessmentRepository.findById(riskAssessmentId)
+                .orElseThrow(() -> new RuntimeException("RiskAssessment non trouvé !"));
+
+        List<RiskFactors> currentRiskFactors = new ArrayList<>(riskAssessment.getRiskFactors());
+
+        // Ajout des nouveaux facteurs de risque
+        if (addRiskFactorIds != null && !addRiskFactorIds.isEmpty()) {
+            List<RiskFactors> newRiskFactors = riskFactorsRepository.findAllById(addRiskFactorIds);
+            currentRiskFactors.addAll(newRiskFactors);
+        }
+
+        // Suppression des facteurs de risque spécifiés
+        if (removeRiskFactorIds != null && !removeRiskFactorIds.isEmpty()) {
+            currentRiskFactors.removeIf(rf -> removeRiskFactorIds.contains(rf.getRiskFactorsId()));
+        }
+
+        riskAssessment.setRiskFactors(currentRiskFactors);
+        riskAssessment = riskAssessmentRepository.save(riskAssessment);
+
+        // Recalculer le score de risque et le prix
+        calculateRiskScore(riskAssessmentId);
+        calculatePrice(riskAssessmentId);
+
+        return riskAssessment;
+    }
+
 }
-
-
