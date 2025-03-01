@@ -5,6 +5,7 @@ import com.example.donationmanagement.repositories.UserManagement.UserRepository
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -15,6 +16,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @Service
 public class UserService implements IUserService {
@@ -110,8 +113,8 @@ public class UserService implements IUserService {
 
     // ✅ 4️⃣ CRUD hérité de `IGenericService`
     @Override
-    public List<User> getAll() {
-        return userRepository.findAll();
+    public Page<User> getAll(Pageable pageable) {
+        return userRepository.findAll(pageable);
     }
 
     @Override
@@ -208,7 +211,17 @@ public class UserService implements IUserService {
         }
         return null;
     }
-    public List<User> getAllDonors() {
-        return userRepository.findByRole(User.Role.DONOR);
+    @Override
+    public Page<User> getAllDonors(Pageable pageable) {  // ✅ Ajoute la pagination pour les donateurs
+        return userRepository.findByRole(User.Role.DONOR, pageable);
+    }
+    public Page<User> getFilteredUsers(String nom, String email, User.Role role, String telephone, Boolean active, Pageable pageable) {
+        Specification<User> spec = Specification.where(UserSpecification.hasNom(nom))
+                .and(UserSpecification.hasEmail(email))
+                .and(UserSpecification.hasRole(role))
+                .and(UserSpecification.hasTelephone(telephone))
+                .and(UserSpecification.isActive(active));
+
+        return userRepository.findAll(spec, pageable);
     }
 }

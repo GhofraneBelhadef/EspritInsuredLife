@@ -33,6 +33,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) // Désactiver CSRF pour API REST
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**", "/oauth2/**").permitAll() // Routes publiques
+
                         .anyRequest().authenticated() // Toutes les autres requêtes nécessitent un token
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)) // ✅ Permettre une session OAuth2

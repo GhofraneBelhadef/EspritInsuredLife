@@ -8,6 +8,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface IUserService extends IGenericService<User, Long> {
     User registerUser(User user, MultipartFile photo, MultipartFile cin, MultipartFile justificatifDomicile, MultipartFile rib,
@@ -21,6 +23,6 @@ public interface IUserService extends IGenericService<User, Long> {
     // ✅ Réinitialisation du mot de passe avec token
     ResponseEntity<String> resetPassword(String token, String newPassword);
     Optional<User> getAuthenticatedUser(HttpServletRequest request);
-
+    Page<User> getFilteredUsers(String nom, String email, User.Role role, String telephone, Boolean active, Pageable pageable);
 
 }

@@ -6,10 +6,14 @@ import com.example.donationmanagement.services.UserManagement.IUserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -29,8 +33,8 @@ public class UserController {
     private UserRepository userRepository;
 
     @GetMapping
-    public List<User> getAllUsers() {
-        return userService.getAll();
+    public ResponseEntity<Page<User>> getAllUsers(Pageable pageable) {
+        return ResponseEntity.ok(userService.getAll(pageable));
     }
 
     @GetMapping("/{id}")
@@ -118,9 +122,25 @@ public class UserController {
         return ResponseEntity.ok("Profil complété avec succès !");
     }
     @GetMapping("/donors")
-    public ResponseEntity<List<User>> getAllDonors() {
-        return ResponseEntity.ok(userService.getAllDonors());
+    public ResponseEntity<Page<User>> getAllDonors(Pageable pageable) {  // ✅ Ajout de la pagination pour les donateurs
+        return ResponseEntity.ok(userService.getAllDonors(pageable));
     }
+    @GetMapping("/search")
+    public ResponseEntity<Page<User>> searchUsers(
+            @RequestParam(required = false) String nom,
+            @RequestParam(required = false) String email,
+            @RequestParam(required = false) User.Role role,
+            @RequestParam(required = false) String telephone,
+            @RequestParam(required = false) Boolean active,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDir) {
 
+        Sort sort = sortDir.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Page<User> users = userService.getFilteredUsers(nom, email, role, telephone, active, pageable);
+        return ResponseEntity.ok(users);
+    }
 
 }
