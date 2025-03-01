@@ -15,5 +15,5 @@ public interface IGenericService<T, ID> {
     T update(ID id, T entity, MultipartFile photo, MultipartFile cin, MultipartFile justificatifDomicile,
              MultipartFile rib, MultipartFile bulletinSalaire, MultipartFile declarationSante, MultipartFile designationBeneficiaire, MultipartFile photoProfil);
     void delete(ID id);  // Supprimer
-    Page<User> getAllDonors(Pageable pageable);
+    List<User> getAllDonors();
 }

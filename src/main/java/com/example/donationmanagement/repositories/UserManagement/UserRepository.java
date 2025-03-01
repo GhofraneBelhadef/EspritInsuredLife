@@ -19,7 +19,7 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
     Optional<User> findByResetToken(String resetToken);
     Optional<User> findByTelephone(String telephone);
     Optional<User> findByGoogleId(String googleId);
-    Page<User> findByRole(User.Role role, Pageable pageable);
+    List<User> findByRole(User.Role role);
     Page<User> findAll(Pageable pageable);
 
 }

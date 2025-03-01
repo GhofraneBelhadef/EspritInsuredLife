@@ -212,9 +212,10 @@ public class UserService implements IUserService {
         return null;
     }
     @Override
-    public Page<User> getAllDonors(Pageable pageable) {  // ✅ Ajoute la pagination pour les donateurs
-        return userRepository.findByRole(User.Role.DONOR, pageable);
+    public List<User> getAllDonors() {
+        return userRepository.findByRole(User.Role.DONOR);
     }
+
     public Page<User> getFilteredUsers(String nom, String email, User.Role role, String telephone, Boolean active, Pageable pageable) {
         Specification<User> spec = Specification.where(UserSpecification.hasNom(nom))
                 .and(UserSpecification.hasEmail(email))

@@ -122,8 +122,8 @@ public class UserController {
         return ResponseEntity.ok("Profil complété avec succès !");
     }
     @GetMapping("/donors")
-    public ResponseEntity<Page<User>> getAllDonors(Pageable pageable) {  // ✅ Ajout de la pagination pour les donateurs
-        return ResponseEntity.ok(userService.getAllDonors(pageable));
+    public ResponseEntity<List<User>> getAllDonors() {
+        return ResponseEntity.ok(userService.getAllDonors());
     }
     @GetMapping("/search")
     public ResponseEntity<Page<User>> searchUsers(
