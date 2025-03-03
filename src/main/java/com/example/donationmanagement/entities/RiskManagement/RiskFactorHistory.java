@@ -1,6 +1,11 @@
 package com.example.donationmanagement.entities.RiskManagement;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import jakarta.persistence.*;
 
@@ -12,6 +17,7 @@ public class RiskFactorHistory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long historyId; // Identifiant de l'historique
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "risk_assessment_id", nullable = false)
     private RiskAssessment riskAssessment; // 🔹 Relation avec RiskAssessment
@@ -20,5 +26,10 @@ public class RiskFactorHistory {
     private int factorValue; // Nouvelle valeur du facteur
     private String description; // Description du changement
     private LocalDateTime changeDate; // Date et heure du changement
-    private Long User; // L'utilisateur concerné par le facteur
+    @PrePersist
+    protected void onCreate() {
+        if (changeDate == null) {
+            changeDate = LocalDateTime.now(); // 🔹 Définit la date automatiquement si elle n’est pas fournie
+        }
+    }
 }

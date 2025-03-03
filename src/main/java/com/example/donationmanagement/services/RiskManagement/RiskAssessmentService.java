@@ -4,6 +4,9 @@ import com.example.donationmanagement.entities.RiskManagement.RiskAssessment;
 import com.example.donationmanagement.entities.RiskManagement.RiskFactors;
 import com.example.donationmanagement.repositories.RiskManagement.RiskFactorsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import com.example.donationmanagement.repositories.RiskManagement.RiskAssessmentRepository;
 import org.springframework.transaction.annotation.Transactional;
@@ -142,5 +145,8 @@ public class RiskAssessmentService implements IRiskAssessmentService {
 
         return riskAssessment;
     }
-
+    public Page<RiskAssessment> getAllRiskAssessments(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return riskAssessmentRepository.findAll(pageable);
+    }
 }

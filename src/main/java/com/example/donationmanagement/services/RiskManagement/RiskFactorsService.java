@@ -6,6 +6,9 @@ import com.example.donationmanagement.entities.RiskManagement.RiskFactors;
 
 import com.example.donationmanagement.repositories.RiskManagement.RiskFactorHistoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import com.example.donationmanagement.repositories.RiskManagement.RiskFactorsRepository;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,10 +21,9 @@ public class RiskFactorsService implements IRiskFactorsService {
     private RiskFactorsRepository RiskFactorsRepository;
     @Autowired
     private RiskFactorHistoryService RiskFactorHistoryService;
-
-    @Override
-    public List<RiskFactors> getAllRiskFactors() {
-        return RiskFactorsRepository.findAll();
+    public Page<RiskFactors> getAllRiskFactors(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return RiskFactorsRepository.findAll(pageable);
     }
     public void deleteRiskFactor(Long RiskFactorsId) {
         if (RiskFactorsRepository.existsById(RiskFactorsId)) {

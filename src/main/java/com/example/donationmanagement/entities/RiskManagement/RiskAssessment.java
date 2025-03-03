@@ -1,7 +1,12 @@
 package com.example.donationmanagement.entities.RiskManagement;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 
@@ -23,6 +28,7 @@ public class RiskAssessment {
     private RiskType RiskType;
     private Double RiskScore = 0.0;
     private BigDecimal Price;
+    @JsonIgnore
     @ManyToMany
     @JoinTable(
             name = "RiskA_RiskF",

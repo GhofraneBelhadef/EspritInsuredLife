@@ -1,6 +1,10 @@
 package com.example.donationmanagement.controllers.RiskManagement;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import com.example.donationmanagement.entities.RiskManagement.RiskAssessment;
 import com.example.donationmanagement.services.RiskManagement.RiskAssessmentService;
@@ -9,12 +13,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 @RestController
 @RequestMapping("/RiskAssessment")
+@Validated
 public class RiskAssessmentController {
     @Autowired
     private RiskAssessmentService RiskAssessmentService;
     @GetMapping
-    public List<RiskAssessment> getAllRiskAssessments() {
-        return RiskAssessmentService.getAllRiskAssessments();
+    public Page<RiskAssessment> getAllRiskAssessments(@RequestParam(defaultValue = "0") int page,
+                                                      @RequestParam(defaultValue = "10") int size) {
+        return RiskAssessmentService.getAllRiskAssessments(page, size);
     }
     @DeleteMapping("/{id}")
     public String deleteAssessment(@PathVariable Long id) {
@@ -28,8 +34,8 @@ public class RiskAssessmentController {
     }
     @PostMapping
     public ResponseEntity<RiskAssessment> createRiskAssessment(
-            @RequestParam Long userId,
-            @RequestParam List<Long> riskFactorIds)  {
+           @Valid @RequestParam Long userId,
+           @Valid @RequestParam List<Long> riskFactorIds)  {
         try{ RiskAssessment riskAssessment = RiskAssessmentService.createRiskAssessment(userId, riskFactorIds);
         return ResponseEntity.ok(riskAssessment);
     } catch (Exception e) {
