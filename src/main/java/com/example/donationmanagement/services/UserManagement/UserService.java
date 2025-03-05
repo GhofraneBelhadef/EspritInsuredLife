@@ -40,10 +40,15 @@ public class UserService implements IUserService {
 
     // ✅ 2️⃣ Implémente `registerUser`
     @Override
-    public User registerUser(User user, MultipartFile photo, MultipartFile cin, MultipartFile justificatifDomicile,
-                             MultipartFile rib, MultipartFile bulletinSalaire, MultipartFile declarationSante,
-                             MultipartFile designationBeneficiaire, MultipartFile photoProfil) throws IOException {
-        // Vérifier si l'email ou le username existent déjà
+    public User registerUser(User user,
+                             MultipartFile cin,
+                             MultipartFile justificatifDomicile,
+                             MultipartFile rib,
+                             MultipartFile bulletinSalaire,
+                             MultipartFile declarationSante,
+                             MultipartFile designationBeneficiaire,
+                             MultipartFile photoProfil) throws IOException {
+        // 🛠️ **Vérifier si l'email ou le username existent déjà**
         if (userRepository.findByEmail(user.getEmail()).isPresent()) {
             throw new RuntimeException("Email déjà utilisé !");
         }
@@ -54,35 +59,39 @@ public class UserService implements IUserService {
             throw new RuntimeException("Numéro de téléphone déjà pris !");
         }
 
-        // Crypter le mot de passe avant d'enregistrer l'utilisateur
+        // 🔒 **Crypter le mot de passe**
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setActive(false);// ⚠️ Mettre `false` car l'utilisateur doit vérifier son compte
+        user.setActive(false);
 
-        // ✅ Générer un token de vérification
+        // ✅ **Générer un token de vérification**
         String verificationToken = UUID.randomUUID().toString();
         user.setVerificationToken(verificationToken);
 
-        // 📌 Enregistrement des fichiers
-        if (photo != null && !photo.isEmpty()) user.setPhotoProfil(photo.getBytes());
-        if (cin != null && !cin.isEmpty()) user.setCin(cin.getBytes());
-        if (justificatifDomicile != null && !justificatifDomicile.isEmpty()) user.setJustificatifDomicile(justificatifDomicile.getBytes());
-        if (rib != null && !rib.isEmpty()) user.setRib(rib.getBytes());
-        if (bulletinSalaire != null && !bulletinSalaire.isEmpty()) user.setBulletinSalaire(bulletinSalaire.getBytes());
-        if (declarationSante != null && !declarationSante.isEmpty()) user.setDeclarationSante(declarationSante.getBytes());
-        if (designationBeneficiaire != null && !designationBeneficiaire.isEmpty()) user.setDesignationBeneficiaire(designationBeneficiaire.getBytes());
-        if (photoProfil != null && !photoProfil.isEmpty()) user.setPhotoProfil(photoProfil.getBytes());
+        // 📌 **Enregistrement des fichiers (ignorer les fichiers vides)**
+        try {
+            if (cin != null && !cin.isEmpty()) user.setCin(cin.getBytes());
+            if (justificatifDomicile != null && !justificatifDomicile.isEmpty()) user.setJustificatifDomicile(justificatifDomicile.getBytes());
+            if (rib != null && !rib.isEmpty()) user.setRib(rib.getBytes());
+            if (bulletinSalaire != null && !bulletinSalaire.isEmpty()) user.setBulletinSalaire(bulletinSalaire.getBytes());
+            if (declarationSante != null && !declarationSante.isEmpty()) user.setDeclarationSante(declarationSante.getBytes());
+            if (designationBeneficiaire != null && !designationBeneficiaire.isEmpty()) user.setDesignationBeneficiaire(designationBeneficiaire.getBytes());
+            if (photoProfil != null && !photoProfil.isEmpty()) user.setPhotoProfil(photoProfil.getBytes());
+        } catch (IOException e) {
+            throw new RuntimeException("Erreur lors de la conversion des fichiers : " + e.getMessage());
+        }
 
         userRepository.save(user);
 
-        // ✅ Envoyer l'email de vérification
+        // ✅ **Envoyer l'email de vérification**
         try {
             emailService.sendVerificationEmail(user.getEmail(), verificationToken);
         } catch (Exception e) {
-            throw new RuntimeException("Erreur lors de l'envoi de l'email.");
+            throw new RuntimeException("Erreur lors de l'envoi de l'email : " + e.getMessage());
         }
 
         return user;
     }
+
 
     // ✅ 2️⃣ Vérification du compte après clic sur le lien dans l'email
     @Override

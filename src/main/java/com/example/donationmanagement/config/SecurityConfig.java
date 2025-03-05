@@ -27,27 +27,46 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, ClientRegistrationRepository clientRegistrationRepository) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // Désactiver CSRF pour API REST
+                .csrf(csrf -> csrf.disable()) // 🔹 Désactiver CSRF pour API REST
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**", "/oauth2/**").permitAll() // Routes publiques
+                        // 🔥 Autoriser Swagger sans authentification
+                        .requestMatchers(
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**",
+                                "/swagger-resources/**",
+                                "/webjars/**"
+                        ).permitAll()
 
-                        .anyRequest().authenticated() // Toutes les autres requêtes nécessitent un token
+                        // ✅ Autoriser les routes publiques
+                        .requestMatchers("/api/auth/**", "/oauth2/**").permitAll()
+
+                        // 🔒 Protéger toutes les autres routes
+                        .anyRequest().authenticated()
                 )
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)) // ✅ Permettre une session OAuth2
-                .oauth2Login(oauth2 -> oauth2
-                        .defaultSuccessUrl("/api/auth/success", true) // ✅ Rediriger après login Google
-                )
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .oauth2Login(oauth2 -> oauth2.defaultSuccessUrl("/api/auth/success", true))
                 .logout(logout -> logout
                         .logoutSuccessHandler(oidcLogoutSuccessHandler(clientRegistrationRepository))
                         .invalidateHttpSession(true)
                         .clearAuthentication(true)
                 )
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class) // ✅ Ajout du filtre JWT
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint((request, response, authException) -> {
+                            String path = request.getRequestURI();
+                            // ✅ Ne pas bloquer Swagger avec cette exception !
+                            if (path.startsWith("/swagger-ui") ||
+                                    path.startsWith("/v3/api-docs") ||
+                                    path.startsWith("/swagger-resources") ||
+                                    path.startsWith("/webjars")) {
+                                response.setStatus(HttpServletResponse.SC_OK);
+                                return;
+                            }
+
                             response.setContentType("application/json");
                             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                             response.getWriter().write("{\"message\": \"Utilisateur non authentifié !\"}");
@@ -61,6 +80,7 @@ public class SecurityConfig {
 
         return http.build();
     }
+
 
 
     @Bean

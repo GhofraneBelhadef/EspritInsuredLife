@@ -12,7 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface IUserService extends IGenericService<User, Long> {
-    User registerUser(User user, MultipartFile photo, MultipartFile cin, MultipartFile justificatifDomicile, MultipartFile rib,
+    User registerUser(User user,  MultipartFile cin, MultipartFile justificatifDomicile, MultipartFile rib,
                       MultipartFile bulletinSalaire, MultipartFile declarationSante, MultipartFile designationBeneficiaire, MultipartFile photoProfil) throws IOException;
 
     Optional<String> login(String email, String password);

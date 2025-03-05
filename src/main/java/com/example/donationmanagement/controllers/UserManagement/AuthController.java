@@ -6,6 +6,7 @@ import com.example.donationmanagement.services.UserManagement.EmailService;
 import com.example.donationmanagement.services.UserManagement.IUserService;
 import com.example.donationmanagement.services.UserManagement.JwtService;
 import com.example.donationmanagement.services.UserManagement.QRCodeService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Valid;
@@ -55,7 +56,7 @@ public class AuthController {
     // ✅ 1️⃣ Register User avec fichiers
     @PostMapping(value = "/register", consumes = "multipart/form-data")
     public ResponseEntity<?> registerUser(
-            @RequestPart("user") @Valid String userJson, // 🔥 Validation des champs User
+            @RequestPart("user") @Valid String userJson,
             @RequestPart(value = "cin", required = false) MultipartFile cin,
             @RequestPart(value = "justificatifDomicile", required = false) MultipartFile justificatifDomicile,
             @RequestPart(value = "rib", required = false) MultipartFile rib,
@@ -65,10 +66,10 @@ public class AuthController {
             @RequestPart(value = "photoProfil", required = false) MultipartFile photoProfil
     ) {
         try {
-            // Convertir `userJson` (String) en Objet `User`
+            // 🛠️ **Convertir `userJson` en Objet `User`**
             User user = objectMapper.readValue(userJson, User.class);
 
-            // Vérifier les contraintes de validation
+            // 🛠️ **Vérifier les contraintes de validation**
             Set<ConstraintViolation<User>> violations = validator.validate(user);
             if (!violations.isEmpty()) {
                 List<String> errors = violations.stream()
@@ -77,18 +78,19 @@ public class AuthController {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
             }
 
-            // Enregistrement utilisateur
-            User savedUser = userService.registerUser(user, photoProfil, cin, justificatifDomicile, rib, bulletinSalaire, declarationSante, designationBeneficiaire, photoProfil);
+            // ✅ **Appel correct de `registerUser` (éviter le doublon de `photoProfil`)**
+            User savedUser = userService.registerUser(user, cin, justificatifDomicile, rib, bulletinSalaire, declarationSante, designationBeneficiaire, photoProfil);
 
             return ResponseEntity.ok().body(savedUser);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"" + e.getMessage() + "\"}");
+        } catch (JsonProcessingException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"Erreur dans le format JSON de l'utilisateur.\"}");
         } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("{\"message\": \"Erreur lors du traitement des fichiers.\"}");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("{\"message\": \"Erreur lors du traitement des fichiers : " + e.getMessage() + "\"}");
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("{\"message\": \"Une erreur inattendue est survenue.\"}");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("{\"message\": \"Une erreur inattendue est survenue : " + e.getMessage() + "\"}");
         }
     }
+
 
 
     @GetMapping("/verify")
