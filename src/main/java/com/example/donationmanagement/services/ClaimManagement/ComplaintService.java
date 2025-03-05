@@ -21,6 +21,9 @@ import org.springframework.web.client.RestTemplate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 @Service
 public class ComplaintService {
@@ -78,6 +81,10 @@ public class ComplaintService {
             notification.setRead(false);
             notificationRepository.save(notification);
         }
+    }
+    public Page<Complaint> getComplaints(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return complaintRepository.findAll(pageable);
     }
     public Object getPrediction(List<Object> features) {
         HttpHeaders headers = new HttpHeaders();

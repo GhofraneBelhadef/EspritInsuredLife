@@ -1,5 +1,8 @@
 package com.example.donationmanagement.controllers.ClaimManagement;
-
+import org.springframework.data.domain.Page;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import com.example.donationmanagement.entities.ClaimManagement.Complaint;
 import com.example.donationmanagement.services.ClaimManagement.ComplaintService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,5 +53,11 @@ public class ComplaintController {
         }
         complaintService.deleteComplaint(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Complaint deleted successfully.");
+    }
+    @GetMapping("/complaints")
+    public Page<Complaint> getComplaints(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return complaintService.getComplaints(page, size);
     }
 }

@@ -1,5 +1,5 @@
 package com.example.donationmanagement.repositories.ClaimManagement;
-
+import org.springframework.data.repository.PagingAndSortingRepository;
 import com.example.donationmanagement.entities.ClaimManagement.Complaint;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
