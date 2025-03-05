@@ -1,6 +1,7 @@
 package com.example.donationmanagement.entities.ContractManagement;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -25,10 +26,17 @@ import java.util.Set;
         private long contract_accounting_id;
 
         @Column(name = "matricule_fiscale", nullable = false, unique = true)
+        @NotNull(message = "Le matricule fiscal ne peut pas être nul.")
+        @Min(value = 1000, message = "Le matricule fiscal doit être supérieur ou égal à 1000.")
+        @Max(value = 9999, message = "Le matricule fiscal doit être inférieur ou égal à 9999.")
         private int matriculeFiscale;
         private float total_capital;
         private float indemnites_versees;
+        @NotNull(message = "La date de création ne peut pas être nulle.")
+        @Past(message = "La date de création doit être dans le passé.")
         private Date created_at;
+
+        @PastOrPresent(message = "La date de mise à jour doit être dans le passé ou présente.")
         private Date updated_at;
         private float totalProvisions;
 

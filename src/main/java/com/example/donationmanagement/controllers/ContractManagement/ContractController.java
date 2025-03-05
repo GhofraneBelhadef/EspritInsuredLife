@@ -3,7 +3,9 @@ package com.example.donationmanagement.controllers.ContractManagement;
 import com.example.donationmanagement.entities.ContractManagement.Contract;
 import com.example.donationmanagement.services.ContractManagement.IContractService;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,7 +23,7 @@ public class ContractController {
      * 🔹 Ajoute un nouveau contrat.
      */
     @PostMapping("/add")
-    public ResponseEntity<Contract> addContract(@RequestBody Contract contract) {
+    public ResponseEntity<Contract> addContract(@Valid @RequestBody Contract contract) {
         if (contract.getInsurrance_type() == null) {
             return ResponseEntity.badRequest().build(); // 400 Bad Request si le type d'assurance est null
         }
@@ -72,6 +74,14 @@ public class ContractController {
     public ResponseEntity<Contract> getContractById(@PathVariable long id) {
         Contract contract = contractService.getById(id);
         return (contract != null) ? ResponseEntity.ok(contract) : ResponseEntity.notFound().build();
+    }
+    @GetMapping("/contracts/all")
+    public ResponseEntity<Page<Contract>> getAllContracts(
+            @RequestParam(defaultValue = "0") int page,      // Numéro de la page
+            @RequestParam(defaultValue = "10") int size) {   // Taille de la page
+
+        Page<Contract> contracts = contractService.getAllContracts(page, size);
+        return ResponseEntity.ok(contracts);  // Retourne la page des contrats
     }
 
 }

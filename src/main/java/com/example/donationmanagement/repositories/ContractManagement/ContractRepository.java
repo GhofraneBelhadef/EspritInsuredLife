@@ -15,4 +15,5 @@ public interface ContractRepository extends JpaRepository<Contract,Long> {
     float sumMonthlyPricesByMatriculeFiscale(@Param("matriculeFiscale") int matriculeFiscale);
     List<Contract> findByContractAccounting_MatriculeFiscale(int matriculeFiscale);
 
+
    }

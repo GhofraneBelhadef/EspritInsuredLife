@@ -8,6 +8,9 @@ import com.example.donationmanagement.repositories.ContractManagement.ContractRe
 import com.example.donationmanagement.repositories.ContractManagement.ProvisionsTechniquesRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Calendar;
@@ -164,6 +167,11 @@ public class ContractService implements IContractService {
         float tauxSinistralite = sinistraliteService.getTauxSinistralite(category);
 
         return contract.getMonthly_price() * 12 * tauxSinistralite;
+    }
+    @Override
+    public Page<Contract> getAllContracts(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);  // Créer un objet Pageable pour la pagination
+        return contractRepository.findAll(pageable);  // Retourne une page de contrats
     }
 
 }
