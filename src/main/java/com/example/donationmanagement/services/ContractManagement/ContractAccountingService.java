@@ -1,17 +1,15 @@
-
 package com.example.donationmanagement.services.ContractManagement;
 
 import com.example.donationmanagement.entities.ContractManagement.ContractAccounting;
+import com.example.donationmanagement.entities.ContractManagement.ProvisionsTechniques;
 import com.example.donationmanagement.repositories.ContractManagement.ContractAccountingRepository;
 import com.example.donationmanagement.repositories.ContractManagement.ContractRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-
 
 @Service
 @Slf4j
@@ -23,9 +21,6 @@ public class ContractAccountingService implements IContractAccountingService {
     @Autowired
     private ContractRepository contractRepository;
 
-    private static final float TAUX_VIE = 0.05f;
-    private static final float TAUX_NON_VIE = 0.07f;
-
     @Override
     public ContractAccounting add(ContractAccounting contractAccounting) {
         log.info("Ajout d'un ContractAccounting avec matricule fiscale: {}", contractAccounting.getMatriculeFiscale());
@@ -34,6 +29,7 @@ public class ContractAccountingService implements IContractAccountingService {
         contractAccounting = contractAccountingRepository.save(contractAccounting);
         return updateContractAccounting(contractAccounting.getContract_accounting_id());
     }
+
     @Override
     public ContractAccounting update(ContractAccounting contractAccounting) {
         log.info("Mise à jour de ContractAccounting: {}", contractAccounting);
@@ -63,59 +59,31 @@ public class ContractAccountingService implements IContractAccountingService {
                 })
                 .orElseThrow(() -> new RuntimeException("ContractAccounting non trouvé pour matricule " + matriculeFiscale));
     }
-
-
     @Override
     public ContractAccounting updateIndemnitesVersees(int matriculeFiscale) {
-        log.info(" Recherche du ContractAccounting avec matricule : {}", matriculeFiscale);
+        log.info("Recherche du ContractAccounting avec matricule : {}", matriculeFiscale);
 
         return contractAccountingRepository.findByMatriculeFiscale(matriculeFiscale)
                 .map(accounting -> {
-                    log.info(" Matricule trouvé, mise à jour des indemnités...");
+                    log.info("Matricule trouvé, mise à jour des indemnités...");
+
+                    // 🔹 Mise à jour des provisions avant le calcul
+                    updateTotalProvisions(accounting);
 
                     // 🔹 Calcul des indemnités
                     float indemniteCalculee = calculerIndemnites(matriculeFiscale, accounting);
                     accounting.setIndemnites_versees(indemniteCalculee);
                     accounting.setUpdated_at(new Date());
 
-                    log.info(" Sauvegarde des nouvelles indemnités : {}", indemniteCalculee);
+                    log.info("Sauvegarde des nouvelles indemnités : {}", indemniteCalculee);
                     return contractAccountingRepository.save(accounting);
                 })
                 .orElseThrow(() -> {
-                    log.error(" Matricule non trouvé en base !");
+                    log.error("Matricule non trouvé en base !");
                     return new RuntimeException("ContractAccounting non trouvé pour matricule " + matriculeFiscale);
                 });
     }
 
-    private float calculerIndemnites(int matriculeFiscale, ContractAccounting accounting) {
-        float provisionsTechniques = accounting.getProvisionsTechniques();
-        float totalCapital = accounting.getTotal_capital();
-
-        if (provisionsTechniques <= 0) {
-            throw new IllegalStateException("Provisions techniques incorrectes ou nulles !");
-        }
-
-        float montant;
-        float taux;  // Définir un taux basé sur le type d'assurance
-
-        if (matriculeFiscale == ContractAccounting.MATRICULE_FISCALE_VIE) {
-            taux = 0.15f; // Exemple : 15% des provisions pour l’assurance vie
-        } else if (matriculeFiscale == ContractAccounting.MATRICULE_FISCALE_NON_VIE) {
-            taux = 0.25f; // Exemple : 25% des provisions pour l’assurance non-vie
-        } else {
-            throw new IllegalArgumentException("Matricule fiscal non reconnu !");
-        }
-
-        // 🟢 Calcul des indemnités basées sur les provisions techniques et le taux défini
-        montant = provisionsTechniques * taux;
-
-        // 🔹 On s'assure que les indemnités ne dépassent pas le totalCapital
-        if (montant > totalCapital) {
-            montant = totalCapital;  // Sécurité pour éviter de payer plus que le capital disponible
-        }
-
-        return montant;
-    }
 
     @Override
     public float getProfit(int matriculeFiscale) {
@@ -133,6 +101,7 @@ public class ContractAccountingService implements IContractAccountingService {
     public ContractAccounting getById(long id) {
         return contractAccountingRepository.findById(id).orElse(null);
     }
+
     @Override
     public float calculerBenefice(int matriculeFiscale) {
         ContractAccounting accounting = contractAccountingRepository.findByMatriculeFiscale(matriculeFiscale)
@@ -140,12 +109,10 @@ public class ContractAccountingService implements IContractAccountingService {
 
         float totalPrimes = contractRepository.sumMonthlyPricesByMatriculeFiscale(matriculeFiscale);
         float indemnites = accounting.getIndemnites_versees();
-        float provisions = accounting.getProvisionsTechniques();
+        float provisions = accounting.getTotalProvisions();
 
-        // 🔹 Frais de gestion (exemple : 5% des primes totales)
         float fraisGestion = totalPrimes * 0.05f;
 
-        // Calcul du bénéfice : Primes encaissées - (Indemnités + Provisions + Frais)
         float benefice = totalPrimes - (indemnites + provisions + fraisGestion);
 
         return benefice;
@@ -158,4 +125,55 @@ public class ContractAccountingService implements IContractAccountingService {
 
         return beneficeVie + beneficeNonVie;
     }
+    @Override
+    public void updateTotalProvisions(ContractAccounting accounting) {
+        if (accounting == null) {
+            log.warn(" ContractAccounting null, impossible de mettre à jour les provisions !");
+            return;
+        }
+
+        if (accounting.getProvisionsTechniques() == null || accounting.getProvisionsTechniques().isEmpty()) {
+            log.warn(" Pas de provisions techniques trouvées pour ContractAccounting ID: {}", accounting.getContract_accounting_id());
+            return;
+        }
+
+        float totalProvisions = (float) accounting.getProvisionsTechniques()
+                .stream()
+                .mapToDouble(ProvisionsTechniques::getProvision)
+                .sum();
+
+        accounting.setTotalProvisions(totalProvisions);
+        contractAccountingRepository.save(accounting);
+
+        log.info(" Total des provisions techniques mises à jour : {}", totalProvisions);
+    }
+    private float calculerIndemnites(int matriculeFiscale, ContractAccounting accounting) {
+        float totalProvisions = accounting.getTotalProvisions();
+        float totalCapital = accounting.getTotal_capital();
+
+        if (totalProvisions <= 0) {
+            throw new IllegalStateException("Provisions techniques incorrectes ou nulles !");
+        }
+
+        float montant;
+        float taux;
+
+        if (matriculeFiscale == ContractAccounting.MATRICULE_FISCALE_VIE) {
+            taux = 0.15f; // Ex: 15% des provisions pour assurance vie
+        } else if (matriculeFiscale == ContractAccounting.MATRICULE_FISCALE_NON_VIE) {
+            taux = 0.25f; // Ex: 25% des provisions pour assurance non-vie
+        } else {
+            throw new IllegalArgumentException("Matricule fiscal non reconnu !");
+        }
+
+        montant = totalProvisions * taux;
+
+        // S'assurer que l'indemnité ne dépasse pas le capital total
+        if (montant > totalCapital) {
+            montant = totalCapital;
+        }
+
+        return montant;
+    }
+
 }

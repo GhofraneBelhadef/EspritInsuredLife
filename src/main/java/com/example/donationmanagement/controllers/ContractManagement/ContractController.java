@@ -73,4 +73,5 @@ public class ContractController {
         Contract contract = contractService.getById(id);
         return (contract != null) ? ResponseEntity.ok(contract) : ResponseEntity.notFound().build();
     }
+
 }

@@ -2,16 +2,33 @@ package com.example.donationmanagement.services.ContractManagement;
 
 import com.example.donationmanagement.entities.ContractManagement.Contract;
 import com.example.donationmanagement.entities.ContractManagement.ContractAccounting;
+import com.example.donationmanagement.entities.ContractManagement.ProvisionsTechniques;
 import com.example.donationmanagement.repositories.ContractManagement.ContractAccountingRepository;
 import com.example.donationmanagement.repositories.ContractManagement.ContractRepository;
+import com.example.donationmanagement.repositories.ContractManagement.ProvisionsTechniquesRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Optional;
+
+import static com.example.donationmanagement.entities.ContractManagement.Contract.Insurrance_Type.Life_Insurance;
+import static com.example.donationmanagement.entities.ContractManagement.Contract.Insurrance_Type.Non_lifeinsurance;
 
 @Service
 @Slf4j
 public class ContractService implements IContractService {
+    @Autowired
+    private SinistraliteService sinistraliteService;
+    @Autowired
+    private MortalityTableService mortalityTableService;
+    @Autowired
+    private ProvisionsTechniquesRepository provisionsTechniquesRepository;
+    @Autowired
+    private ContractAccountingService contractAccountingService;
 
     private final ContractRepository contractRepository;
     private final ContractAccountingRepository contractAccountingRepository;
@@ -29,26 +46,44 @@ public class ContractService implements IContractService {
 
         log.info("Ajout d'un nouveau contrat avec insurance type: {}", contract.getInsurrance_type());
 
-        int matriculeFiscale;
-        if (contract.getInsurrance_type() == Contract.Insurrance_Type.Life_Insurance) {
-            matriculeFiscale = 1001;
-        } else if (contract.getInsurrance_type() == Contract.Insurrance_Type.Non_lifeinsurance) {
-            matriculeFiscale = 2002;
-        } else {
-            throw new IllegalArgumentException("Type d'assurance inconnu !");
+        int matriculeFiscale = switch (contract.getInsurrance_type()) {
+            case Life_Insurance -> 1001;
+            case Non_lifeinsurance -> 2002;
+            default -> throw new IllegalArgumentException("Type d'assurance inconnu !");
+        };
+
+        Optional<ContractAccounting> optionalAccounting = contractAccountingRepository.findByMatriculeFiscale(matriculeFiscale);
+        if (optionalAccounting.isEmpty()) {
+            throw new RuntimeException("Aucun ContractAccounting trouvé pour le matricule " + matriculeFiscale);
         }
 
-        ContractAccounting accounting = contractAccountingRepository.findByMatriculeFiscale(matriculeFiscale)
-                .orElseThrow(() -> new RuntimeException("Aucun ContractAccounting trouvé pour le matricule " + matriculeFiscale));
-
+        ContractAccounting accounting = optionalAccounting.get();
         contract.setContractAccounting(accounting);
-        Contract savedContract = contractRepository.save(contract);
 
-        // Mise à jour du total capital dans ContractAccounting
+        // 🔹 Étape 1 : Sauvegarder d'abord le contrat
+        contract = contractRepository.save(contract);
+        log.info("Contrat sauvegardé avec ID: {}", contract.getContract_id());
+
+        // 🔹 Étape 2 : Vérifier si une provision existe déjà, sinon la créer
+        Optional<ProvisionsTechniques> existingProvision = provisionsTechniquesRepository.findByContract(contract);
+        float provision = calculateProvision(contract);
+
+        ProvisionsTechniques provisionsTechniques = existingProvision.orElse(new ProvisionsTechniques());
+        provisionsTechniques.setProvision(provision);
+        provisionsTechniques.setContract(contract);
+        provisionsTechniques.setCreatedAt(new Date());
+
+        provisionsTechniques = provisionsTechniquesRepository.save(provisionsTechniques);
+        contract.setProvisionsTechniques(provisionsTechniques);
+        log.info("Provision technique sauvegardée avec ID: {}", provisionsTechniques.getId());
+
+        // 🔹 Étape 3 : Mise à jour du total capital et total des provisions
         accounting.updateTotalCapital();
+        contractAccountingService.updateTotalProvisions(accounting);
         contractAccountingRepository.save(accounting);
+        log.info("Total capital et provisions mis à jour pour l'accounting ID: {}", accounting.getContract_accounting_id());
 
-        return savedContract;
+        return contract;
     }
 
     @Override
@@ -71,7 +106,8 @@ public class ContractService implements IContractService {
 
     @Override
     public Contract getById(long id) {
-        return contractRepository.findById(id).orElseThrow(() -> new RuntimeException("Contrat non trouvé avec ID: " + id));
+        return contractRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Contrat non trouvé avec ID: " + id));
     }
 
     @Override
@@ -80,7 +116,59 @@ public class ContractService implements IContractService {
         return contractRepository.findAll();
     }
 
+
+
     public boolean hasContractsForMatricule(int matriculeFiscale) {
         return !contractRepository.findByContractAccounting_MatriculeFiscale(matriculeFiscale).isEmpty();
     }
+
+    private float calculateProvision(Contract contract) {
+        float provision = switch (contract.getInsurrance_type()) {
+            case Life_Insurance -> calculateLifeInsuranceProvision(contract);
+            case Non_lifeinsurance -> calculateNonLifeInsuranceProvision(contract);
+        };
+
+        log.info("Provision calculée pour le contrat ID {}: {}", contract.getContract_id(), provision);
+        return provision;
+    }
+
+
+    private float calculateLifeInsuranceProvision(Contract contract) {
+        int age = contract.getInsuredAge();
+        float monthlyPrice = contract.getMonthly_price();
+
+        Calendar startCalendar = Calendar.getInstance();
+        startCalendar.setTime(contract.getPolicy_inception_date());
+
+        Calendar endCalendar = Calendar.getInstance();
+        endCalendar.setTime(contract.getExpiration_date());
+
+        int yearsRemaining = endCalendar.get(Calendar.YEAR) - startCalendar.get(Calendar.YEAR);
+
+        log.info("🟢 Calcul Life Insurance Provision: Age={} | Years Remaining={} | Monthly Price={}",
+                age, yearsRemaining, monthlyPrice);
+
+        float provision = 0.0f;
+        for (int t = 0; t < yearsRemaining; t++) {
+            float probMort = mortalityTableService.getProbabilityOfDeath(age + t);
+            log.info("   🔹 Année {}: probMort={} | Prime Annuelle={}", t, probMort, monthlyPrice * 12);
+            provision += probMort * monthlyPrice * 12;
+        }
+
+        log.info("✅ Provision calculée = {}", provision);
+        return provision;
+    }
+
+    private float calculateNonLifeInsuranceProvision(Contract contract) {
+        String category = contract.getCategory_contract().name();
+        float tauxSinistralite = sinistraliteService.getTauxSinistralite(category);
+
+        return contract.getMonthly_price() * 12 * tauxSinistralite;
+    }
+
 }
+
+
+
+
+

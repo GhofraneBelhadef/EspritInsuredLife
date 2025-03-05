@@ -29,7 +29,7 @@ public class Contract {
 
     @Enumerated(EnumType.STRING)
     private Insurrance_Type insurrance_type;
-
+    private int insuredAge;
     @Enumerated(EnumType.STRING)
     private Category_contract category_contract;
     private Date Policy_inception_date;
@@ -43,6 +43,8 @@ public class Contract {
     @ManyToOne
     @JoinColumn(name = "contract_accounting_id")
     ContractAccounting contractAccounting;
+    @OneToOne(mappedBy = "contract", cascade = CascadeType.ALL)
+    private ProvisionsTechniques provisionsTechniques;
 
 
 

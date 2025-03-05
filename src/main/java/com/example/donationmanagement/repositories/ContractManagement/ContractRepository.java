@@ -14,4 +14,5 @@ public interface ContractRepository extends JpaRepository<Contract,Long> {
     @Query("SELECT COALESCE(SUM(c.monthly_price), 0) FROM Contract c WHERE c.contractAccounting.matriculeFiscale = :matriculeFiscale AND c.status = 'Active'")
     float sumMonthlyPricesByMatriculeFiscale(@Param("matriculeFiscale") int matriculeFiscale);
     List<Contract> findByContractAccounting_MatriculeFiscale(int matriculeFiscale);
+
    }

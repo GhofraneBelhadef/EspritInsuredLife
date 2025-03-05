@@ -1,13 +1,19 @@
 package com.example.donationmanagement.controllers.ContractManagement;
 
 import com.example.donationmanagement.entities.ContractManagement.ContractAccounting;
+import com.example.donationmanagement.repositories.ContractManagement.ContractAccountingRepository;
+import com.example.donationmanagement.services.ContractManagement.ContractAccountingService;
 import com.example.donationmanagement.services.ContractManagement.IContractAccountingService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.math.BigDecimal;
 import java.util.List;
 
 @Tag(name = "Gestion ContractAccounting")
@@ -17,6 +23,11 @@ public class ContractAccountingController {
     private static final Logger log = LoggerFactory.getLogger(ContractAccountingController.class);
     @Autowired
     private IContractAccountingService contractAccountingService;
+    @Autowired
+    private ContractAccountingRepository contractAccountingRepository;
+
+
+
 
     /**
      * 🔹 Ajoute un ContractAccounting (⚠️ Vérifier si nécessaire).
@@ -116,5 +127,17 @@ public class ContractAccountingController {
     public ResponseEntity<Float> getBeneficeTotal() {
         float beneficeTotal = contractAccountingService.calculerBeneficeTotal();
         return ResponseEntity.ok(beneficeTotal);
+    }
+    @GetMapping("/total-provisions/{accountingId}")
+    public ResponseEntity<Float> getTotalProvisions(@PathVariable Long accountingId) {
+        // Récupérer le ContractAccounting
+        ContractAccounting accounting = contractAccountingRepository.findById(accountingId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "ContractAccounting introuvable"));
+
+        // Mettre à jour les provisions
+        contractAccountingService.updateTotalProvisions(accounting);
+
+        // Retourner la valeur mise à jour
+        return ResponseEntity.ok(accounting.getTotalProvisions());
     }
 }

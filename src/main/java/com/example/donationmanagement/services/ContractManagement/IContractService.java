@@ -10,4 +10,5 @@ public interface IContractService {
     void remove(long id);
     Contract getById(long id);
     List<Contract> getAll();
+
 }

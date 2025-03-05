@@ -7,6 +7,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
     @ToString(exclude = {"contracts"})
@@ -29,9 +30,12 @@ import java.util.Set;
         private float indemnites_versees;
         private Date created_at;
         private Date updated_at;
-        private float provisionsTechniques;
+        private float totalProvisions;
+
         @OneToMany(cascade = CascadeType.ALL, mappedBy = "contractAccounting")
         private Set<Contract> contracts;
+        @OneToMany(mappedBy = "contractAccounting", cascade = CascadeType.ALL, orphanRemoval = true)
+        private List<ProvisionsTechniques> provisionsTechniques;
         public void updateTotalCapital() {
             if (contracts != null) {
                 this.total_capital = (float) contracts.stream()
@@ -53,7 +57,6 @@ import java.util.Set;
             } else {
                 this.total_capital = 0;
             }}
-
 
 
 

@@ -17,6 +17,7 @@ public interface IContractAccountingService {
     ContractAccounting update(ContractAccounting contract_accounting);
     float calculerBenefice(int matriculeFiscale); // ✅ Vérifie bien ce type de retour
     float calculerBeneficeTotal();
+    void updateTotalProvisions(ContractAccounting accounting);
 
 
 }
