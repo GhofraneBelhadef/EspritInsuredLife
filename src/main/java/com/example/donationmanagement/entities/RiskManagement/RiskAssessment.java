@@ -28,6 +28,12 @@ public class RiskAssessment {
     private RiskType RiskType;
     private Double RiskScore = 0.0;
     private BigDecimal Price;
+    private String userWhatsapp;
+    private String medicalRecordPath;
+    private int Age;
+    private String ChronicDisease;
+    @Lob
+    private byte[] medicalRecord;
     @JsonIgnore
     @ManyToMany
     @JoinTable(
@@ -36,6 +42,5 @@ public class RiskAssessment {
             inverseJoinColumns = @JoinColumn(name = "idFactor")
     )
     private List<RiskFactors> RiskFactors;
-
 }
 
