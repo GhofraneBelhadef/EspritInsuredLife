@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\services\ContractManagement\ReportingService.java
 C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\entities\DonationManagement\WalletTransaction.java
 C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\services\ContractManagement\IContractHolderService.java
@@ -78,3 +79,15 @@ C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationman
 C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\entities\RiskManagement\RiskAssessment.java
 C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\repositories\DonationManagement\DonationRepository.java
 C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\services\DonationManagement\IDonationService.java
+=======
+C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\controllers\ClaimManagement\NotificationController.java
+C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\entities\ClaimManagement\Notification.java
+C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\DonationManagementApplication.java
+C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\services\ClaimManagement\ComplaintService.java
+C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\config\AppConfig.java
+C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\repositories\ClaimManagement\ComplaintRepository.java
+C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\entities\ClaimManagement\Complaint.java
+C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\repositories\ClaimManagement\NotificationRepository.java
+C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\services\ClaimManagement\NotificationService.java
+C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\controllers\ClaimManagement\ComplaintController.java
+>>>>>>> ClaimManagement1
