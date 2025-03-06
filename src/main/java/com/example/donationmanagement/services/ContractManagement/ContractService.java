@@ -3,9 +3,13 @@ package com.example.donationmanagement.services.ContractManagement;
 import com.example.donationmanagement.entities.ContractManagement.Contract;
 import com.example.donationmanagement.entities.ContractManagement.ContractAccounting;
 import com.example.donationmanagement.entities.ContractManagement.ProvisionsTechniques;
+import com.example.donationmanagement.entities.UserManagement.User;
 import com.example.donationmanagement.repositories.ContractManagement.ContractAccountingRepository;
 import com.example.donationmanagement.repositories.ContractManagement.ContractRepository;
 import com.example.donationmanagement.repositories.ContractManagement.ProvisionsTechniquesRepository;
+import com.example.donationmanagement.repositories.UserManagement.UserRepository;
+import com.example.donationmanagement.services.UserManagement.JwtService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -32,6 +36,11 @@ public class ContractService implements IContractService {
     private ProvisionsTechniquesRepository provisionsTechniquesRepository;
     @Autowired
     private ContractAccountingService contractAccountingService;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private JwtService jwtService;
+
 
     private final ContractRepository contractRepository;
     private final ContractAccountingRepository contractAccountingRepository;
@@ -40,9 +49,22 @@ public class ContractService implements IContractService {
         this.contractRepository = contractRepository;
         this.contractAccountingRepository = contractAccountingRepository;
     }
+    private String extractToken(HttpServletRequest request) {
+        String header = request.getHeader("Authorization");  // Récupérer l'en-tête Authorization
+        if (header != null && header.startsWith("Bearer ")) {
+            return header.substring(7);  // Extraire le token après le mot "Bearer "
+        }
+        return null;  // Si le token n'est pas présent ou ne commence pas par "Bearer "
+    }
+    public Contract add(Contract contract, HttpServletRequest request) {
+        // Récupérer l'utilisateur authentifié
+        Optional<User> authenticatedUser = getAuthenticatedUser(request);
+        if (authenticatedUser.isEmpty()) {
+            throw new RuntimeException("Utilisateur non authentifié !");
+        }
+        User user = authenticatedUser.get();
+        contract.setUser(user); // Associer l'utilisateur au contrat
 
-    @Override
-    public Contract add(Contract contract) {
         if (contract.getInsurrance_type() == null) {
             throw new IllegalArgumentException("Le type d'assurance ne peut pas être nul !");
         }
@@ -87,6 +109,15 @@ public class ContractService implements IContractService {
         log.info("Total capital et provisions mis à jour pour l'accounting ID: {}", accounting.getContract_accounting_id());
 
         return contract;
+    }
+
+    public Optional<User> getAuthenticatedUser(HttpServletRequest request) {
+        String token = extractToken(request);
+        if (token != null) {
+            Long userId = jwtService.extractUserId(token);
+            return userRepository.findById(userId); // Recherche l'utilisateur par ID
+        }
+        return Optional.empty();
     }
 
     @Override

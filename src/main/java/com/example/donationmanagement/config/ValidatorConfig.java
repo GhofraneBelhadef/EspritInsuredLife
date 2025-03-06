@@ -1,6 +1,7 @@
 package com.example.donationmanagement.config;
 
 
+
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
@@ -16,3 +17,4 @@ public class ValidatorConfig {
         return factory.getValidator();
     }
 }
+

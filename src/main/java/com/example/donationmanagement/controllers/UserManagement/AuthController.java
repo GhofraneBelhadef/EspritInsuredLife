@@ -1,53 +1,62 @@
 package com.example.donationmanagement.controllers.UserManagement;
 
 import com.example.donationmanagement.entities.UserManagement.User;
+import com.example.donationmanagement.repositories.UserManagement.UserRepository;
 import com.example.donationmanagement.services.UserManagement.EmailService;
 import com.example.donationmanagement.services.UserManagement.IUserService;
+import com.example.donationmanagement.services.UserManagement.JwtService;
 import com.example.donationmanagement.services.UserManagement.QRCodeService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
+import jakarta.validation.Valid;
+import jakarta.validation.Validator;
+import jakarta.validation.ConstraintViolation;
 
 @RestController
 @RequestMapping("/api/auth")
 @CrossOrigin(origins = "*") // Permet de tester avec Angular
+@Validated
 public class AuthController {
 
     private final IUserService userService;
     private final ObjectMapper objectMapper;
     private final QRCodeService qrCodeService;
     private final Map<String, String> tokenStorage = new HashMap<>();
+    private final Validator validator;
 
 
     @Autowired
     private EmailService emailService;
 
-    public AuthController(IUserService userService, ObjectMapper objectMapper, QRCodeService qrCodeService) {
+
+    public AuthController(IUserService userService, ObjectMapper objectMapper, QRCodeService qrCodeService, Validator validator) {
         this.userService = userService;
         this.objectMapper = objectMapper;
         this.qrCodeService = qrCodeService;
+        this.validator = validator;
 
     }
 
     // ✅ 1️⃣ Register User avec fichiers
     @PostMapping(value = "/register", consumes = "multipart/form-data")
-    public User registerUser(
-            @RequestPart("user") String userJson, // 🔥 Doit être en `String`
-
-
-
-
+    public ResponseEntity<?> registerUser(
+            @RequestPart("user") @Valid String userJson,
             @RequestPart(value = "cin", required = false) MultipartFile cin,
             @RequestPart(value = "justificatifDomicile", required = false) MultipartFile justificatifDomicile,
             @RequestPart(value = "rib", required = false) MultipartFile rib,
@@ -55,13 +64,35 @@ public class AuthController {
             @RequestPart(value = "declarationSante", required = false) MultipartFile declarationSante,
             @RequestPart(value = "designationBeneficiaire", required = false) MultipartFile designationBeneficiaire,
             @RequestPart(value = "photoProfil", required = false) MultipartFile photoProfil
-    ) throws IOException {
+    ) {
+        try {
+            // 🛠️ **Convertir `userJson` en Objet `User`**
+            User user = objectMapper.readValue(userJson, User.class);
 
-        // Convertir `userJson` (String) en Objet `User`
-        User user = objectMapper.readValue(userJson, User.class);
+            // 🛠️ **Vérifier les contraintes de validation**
+            Set<ConstraintViolation<User>> violations = validator.validate(user);
+            if (!violations.isEmpty()) {
+                List<String> errors = violations.stream()
+                        .map(ConstraintViolation::getMessage)
+                        .collect(Collectors.toList());
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
+            }
 
-        return userService.registerUser(user, photoProfil, cin, justificatifDomicile, rib, bulletinSalaire, declarationSante, designationBeneficiaire,photoProfil);
+            // ✅ **Appel correct de `registerUser` (éviter le doublon de `photoProfil`)**
+            User savedUser = userService.registerUser(user, cin, justificatifDomicile, rib, bulletinSalaire, declarationSante, designationBeneficiaire, photoProfil);
+
+            return ResponseEntity.ok().body(savedUser);
+        } catch (JsonProcessingException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"Erreur dans le format JSON de l'utilisateur.\"}");
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("{\"message\": \"Erreur lors du traitement des fichiers : " + e.getMessage() + "\"}");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("{\"message\": \"Une erreur inattendue est survenue : " + e.getMessage() + "\"}");
+        }
     }
+
+
+
     @GetMapping("/verify")
     public String verifyUser(@RequestParam("token") String token) {
         return userService.verifyUser(token);
@@ -121,10 +152,40 @@ public class AuthController {
             return ResponseEntity.status(401).body("⛔ QR Code invalide ou expiré");
         }
     }
+    @Autowired
+    private JwtService jwtService;
+
+    @Autowired
+    private UserRepository userRepository;
     @GetMapping("/success")
-    public Map<String, Object> getUserInfo(@AuthenticationPrincipal OAuth2User principal) {
-        return principal.getAttributes(); // Retourne les infos de l'utilisateur
+    public ResponseEntity<?> getUserInfo(OAuth2AuthenticationToken authenticationToken) {
+        if (authenticationToken == null || authenticationToken.getPrincipal() == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "Utilisateur non authentifié après OAuth2 !"));
+        }
+
+        OAuth2User oAuth2User = authenticationToken.getPrincipal();
+        String googleId = oAuth2User.getAttribute("sub");
+        String email = oAuth2User.getAttribute("email");
+
+        Optional<User> existingUser = userRepository.findByGoogleId(googleId);
+
+        if (existingUser.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "Utilisateur non trouvé après OAuth2 !"));
+        }
+
+        User user = existingUser.get();
+
+        // ✅ Générer le Token JWT sans le stocker
+        String jwtToken = jwtService.generateToken(user);
+
+        return ResponseEntity.ok(Map.of(
+                "token", jwtToken,
+                "user", oAuth2User.getAttributes()
+        ));
     }
+
 
 
 }

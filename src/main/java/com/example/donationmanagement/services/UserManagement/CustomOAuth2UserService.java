@@ -10,6 +10,7 @@ import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.UUID;
 
 
 @Service
@@ -59,7 +60,9 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
             // ✅ Initialiser le téléphone à NULL (l'utilisateur devra le renseigner)
             user.setTelephone(null);
-            user.setUsername(null);
+            if (user.getUsername() == null) {
+                user.setUsername("google_user_" + UUID.randomUUID().toString().substring(0, 8)); // Générer un username temporaire
+            }
 
             // ❌ Marquer le profil comme incomplet
             user.setProfilComplet(false);

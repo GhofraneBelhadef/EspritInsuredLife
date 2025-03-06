@@ -21,11 +21,11 @@ public class User {
     private Long id;
 
     @Column(nullable = false)
-
+    @NotBlank(message = "Le nom est obligatoire.")
     private String nom;
 
     @Column(nullable = false)
-
+    @NotBlank(message = "Le prénom est obligatoire.")
     private String prenom;
 
     @Column(unique = true, nullable = false)
@@ -34,14 +34,18 @@ public class User {
     private String email;
 
     @Column(nullable = false)
+
+    @Size(min = 6, message = "Le mot de passe doit contenir au moins 6 caractères.")
     private String password;
 
     @Column(nullable = false, unique = true)
 
 
+    @NotBlank(message = "Le nom d'utilisateur est obligatoire.")
     private String username;
 
     @Column(nullable = true, unique = true)
+    @Pattern(regexp = "^(\\+\\d{1,3}[- ]?)?\\d{10}$", message = "Numéro de téléphone invalide.")
     private String telephone;
 
     private LocalDate dateNaissance;  // ✅ Remplace `Date` par `LocalDate` (plus moderne)

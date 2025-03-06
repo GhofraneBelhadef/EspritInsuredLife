@@ -1,5 +1,6 @@
 package com.example.donationmanagement.entities.ContractManagement;
 
+import com.example.donationmanagement.entities.UserManagement.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
@@ -56,9 +57,9 @@ public class Contract {
     ContractAccounting contractAccounting;
     @OneToOne(mappedBy = "contract", cascade = CascadeType.ALL)
     private ProvisionsTechniques provisionsTechniques;
-
-
-
+    @ManyToOne
+    @JoinColumn(name = "user_id")  // Cette colonne va être utilisée comme clé étrangère
+    private User user;
 }
 
 
