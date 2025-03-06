@@ -1,5 +1,6 @@
 package com.example.donationmanagement.entities.ContractManagement;
 
+import com.example.donationmanagement.entities.DonationManagement.Donation;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -46,7 +47,14 @@ public class Contract {
     @JoinColumn(name = "contract_accounting_id")
     ContractAccounting contract_accounting;
 
+    @OneToMany(mappedBy = "contract", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Donation> donations; // Donations made to this contract
 
 
+    private double totalDonations; // Total donations allocated to this contract
 }
+
+
+
+
 

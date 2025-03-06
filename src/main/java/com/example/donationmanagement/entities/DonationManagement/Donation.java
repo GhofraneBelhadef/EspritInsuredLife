@@ -1,5 +1,6 @@
 package com.example.donationmanagement.entities.DonationManagement;
 
+import com.example.donationmanagement.entities.ContractManagement.Contract;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -19,13 +20,13 @@ public class Donation {
     private Long donation_id;
 
     private int donor_id;
-    private int contract_id;
 
     private double donation_amount;
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date donation_date;
-    public static StatusDonation status;
-    private enum StatusDonation{
+    private StatusDonation StatusDonation;
+
+    public enum StatusDonation{
         Pending,
         Completed,
         Cancelled
@@ -35,4 +36,8 @@ public class Donation {
     @ManyToOne
     @JoinColumn(name = "campaign_id")
     private Campaign campaign;
+    @ManyToOne
+    @JoinColumn(name = "contract_id")
+    private Contract contract;
+
 }

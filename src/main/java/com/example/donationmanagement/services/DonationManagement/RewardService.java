@@ -4,6 +4,8 @@ import com.example.donationmanagement.entities.DonationManagement.Reward;
 import com.example.donationmanagement.repositories.DonationManagement.RewardRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,20 +30,23 @@ public class RewardService implements IRewardService {
     }
 
     @Override
-    public void remove(Long id) {
-        log.info("Removing reward with ID: {}", id);
-        rewardRepo.deleteById(id);
+    public void remove(Long reward_id) {
+        log.info("Removing reward with ID: {}", reward_id);
+        rewardRepo.deleteById(reward_id);
     }
 
     @Override
-    public Reward getById(Long id) {
-        log.info("Fetching reward with ID: {}", id);
-        return rewardRepo.findById(id).orElse(null);
+    public Reward getById(Long reward_id) {
+        log.info("Fetching reward with ID: {}", reward_id);
+        return rewardRepo.findById(reward_id).orElse(null);
     }
 
-    @Override
-    public List<Reward> getAll() {
-        log.info("Fetching all rewards");
-        return rewardRepo.findAll();
+
+    public Page<Reward> getAll(Pageable pageable) {
+        return rewardRepo.findAll(pageable);
+    }
+
+    public Page<Reward> getRewardsByType(String reward_type, Pageable pageable) {
+        return rewardRepo.findByRewardType(reward_type, pageable);
     }
 }

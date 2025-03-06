@@ -4,6 +4,8 @@ import com.example.donationmanagement.entities.DonationManagement.DigitalWallet;
 import com.example.donationmanagement.repositories.DonationManagement.DigitalWalletRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 
@@ -21,7 +23,7 @@ public class DigitalWalletService implements IDigitalWalletService {
         log.info("Adding digital wallet: {}", digitalWallet);
         return digitalWalletRepo.save(digitalWallet);
     }
-/*
+
     @Override
     public DigitalWallet update(DigitalWallet digitalWallet) {
         log.info("Updating digital wallet: {}", digitalWallet);
@@ -32,28 +34,31 @@ public class DigitalWalletService implements IDigitalWalletService {
 
         // Mettez à jour les champs
         existingWallet.setBalance(digitalWallet.getBalance());
-        existingWallet.setDonor_id(digitalWallet.getDonor_id());
+        existingWallet.setDonor(digitalWallet.getDonor());
         existingWallet.setLast_update(digitalWallet.getLast_update());
 
         // Sauvegardez les modifications
         return digitalWalletRepo.save(existingWallet);
-    }*/
-
-    @Override
-    public void remove(int id) {
-        log.info("Removing digital wallet with ID: {}", id);
-        digitalWalletRepo.deleteById(id);
     }
 
     @Override
-    public DigitalWallet getById(int id) {
-        log.info("Fetching digital wallet with ID: {}", id);
-        return digitalWalletRepo.findById(id).orElse(null);
+    public void remove(int digital_wallet_id) {
+        log.info("Removing digital wallet with ID: {}", digital_wallet_id);
+        digitalWalletRepo.deleteById(digital_wallet_id);
     }
 
     @Override
-    public List<DigitalWallet> getAll() {
-        log.info("Fetching all digital wallets");
-        return digitalWalletRepo.findAll();
+    public DigitalWallet getById(int digital_wallet_id) {
+        log.info("Fetching digital wallet with ID: {}", digital_wallet_id);
+        return digitalWalletRepo.findById(digital_wallet_id).orElse(null);
+    }
+
+
+    public Page<DigitalWallet> getAll(Pageable pageable) {
+        return digitalWalletRepo.findAll(pageable);
+    }
+
+    public Page<DigitalWallet> getWalletsByBalanceRange(double minBalance, double maxBalance, Pageable pageable) {
+        return digitalWalletRepo.findByBalanceBetween(minBalance, maxBalance, pageable);
     }
 }
