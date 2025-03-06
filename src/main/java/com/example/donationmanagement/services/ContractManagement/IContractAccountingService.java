@@ -1,18 +1,27 @@
 package com.example.donationmanagement.services.ContractManagement;
 
-import com.example.donationmanagement.entities.ContractManagement.Contract_Accounting;
+import com.example.donationmanagement.entities.ContractManagement.ContractAccounting;
+
+import java.util.List;
+
+import com.example.donationmanagement.entities.ContractManagement.ContractAccounting;
 
 import java.util.List;
 
 public interface IContractAccountingService {
-    Contract_Accounting add(Contract_Accounting contractaccounting);
+    ContractAccounting add(ContractAccounting contractaccounting);
 
-    /*Contract_Accounting updateTotalCapital(int matriculeFiscale);*/
+    ContractAccounting updateTotalCapital(int matriculeFiscale);
 
-    /*Contract_Accounting updateIndemnitesVersees(int matriculeFiscale, float montant);*/
+    ContractAccounting updateIndemnitesVersees(int matriculeFiscale);
 
-    /* float getProfit(int matriculeFiscale);*/
-    List<Contract_Accounting> getAll();
-    Contract_Accounting getById(long id);
-    Contract_Accounting update(Contract_Accounting contract_accounting);
+    float getProfit(int matriculeFiscale);
+    List<ContractAccounting> getAll();
+    ContractAccounting getById(long id);
+    ContractAccounting update(ContractAccounting contract_accounting);
+    float calculerBenefice(int matriculeFiscale); // ✅ Vérifie bien ce type de retour
+    float calculerBeneficeTotal();
+    void updateTotalProvisions(ContractAccounting accounting);
+
+
 }

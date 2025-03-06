@@ -1,7 +1,11 @@
 package com.example.donationmanagement.repositories.ContractManagement;
 
-import com.example.donationmanagement.entities.ContractManagement.Contract_Accounting;
+import com.example.donationmanagement.entities.ContractManagement.ContractAccounting;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface ContractAccountingRepository extends JpaRepository<Contract_Accounting,Long> {
+import java.util.Optional;
+
+public interface ContractAccountingRepository extends JpaRepository<ContractAccounting,Long> {
+    Optional<ContractAccounting> findByMatriculeFiscale(int matriculeFiscale);
+
 }
