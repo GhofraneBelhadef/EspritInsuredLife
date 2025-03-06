@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+
 import java.util.List;
 
 @Service
@@ -20,12 +21,23 @@ public class DigitalWalletService implements IDigitalWalletService {
         log.info("Adding digital wallet: {}", digitalWallet);
         return digitalWalletRepo.save(digitalWallet);
     }
-
+/*
     @Override
     public DigitalWallet update(DigitalWallet digitalWallet) {
         log.info("Updating digital wallet: {}", digitalWallet);
-        return digitalWalletRepo.save(digitalWallet);
-    }
+
+        // Vérifiez si le portefeuille existe
+        DigitalWallet existingWallet = digitalWalletRepo.findById((int) digitalWallet.getDigital_wallet_id())
+                .orElseThrow(() -> new RuntimeException("Portefeuille non trouvé avec l'ID : " + digitalWallet.getDigital_wallet_id()));
+
+        // Mettez à jour les champs
+        existingWallet.setBalance(digitalWallet.getBalance());
+        existingWallet.setDonor_id(digitalWallet.getDonor_id());
+        existingWallet.setLast_update(digitalWallet.getLast_update());
+
+        // Sauvegardez les modifications
+        return digitalWalletRepo.save(existingWallet);
+    }*/
 
     @Override
     public void remove(int id) {

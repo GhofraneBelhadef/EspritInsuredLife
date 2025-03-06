@@ -18,11 +18,11 @@ public class DigitalWalletController {
     public DigitalWallet addDigitalWallet(@RequestBody DigitalWallet digitalWallet) {
         return digitalWalletService.add(digitalWallet);
     }
-
+/*
     @PutMapping("/update")
     public DigitalWallet updateDigitalWallet(@RequestBody DigitalWallet digitalWallet) {
         return digitalWalletService.update(digitalWallet);
-    }
+    }*/
 
     @DeleteMapping("/remove/{id}")
     public void removeDigitalWallet(@PathVariable int id) {

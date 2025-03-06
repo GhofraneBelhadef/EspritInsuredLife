@@ -1,8 +1,7 @@
 package com.example.donationmanagement.entities.DonationManagement;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -17,14 +16,15 @@ import java.util.Date;
 @Entity
 public class Donation {
     @Id
-    private Long id_donation;
+    private Long donation_id;
 
     private int donor_id;
     private int contract_id;
 
     private double donation_amount;
-
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date donation_date;
+    public static StatusDonation status;
     private enum StatusDonation{
         Pending,
         Completed,
@@ -32,4 +32,7 @@ public class Donation {
     }
     @OneToOne(mappedBy = "donation")
     private Reward reward;
+    @ManyToOne
+    @JoinColumn(name = "campaign_id")
+    private Campaign campaign;
 }
