@@ -3,6 +3,7 @@ package com.example.donationmanagement.entities.DonationManagement;
 import com.example.donationmanagement.entities.ContractManagement.Contract;
 import com.example.donationmanagement.entities.UserManagement.User;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -34,9 +35,11 @@ public class Donation {
     }
     @OneToOne(mappedBy = "donation")
     private Reward reward;
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "campaign_id")
     private Campaign campaign;
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "contract_id")
     private Contract contract;
