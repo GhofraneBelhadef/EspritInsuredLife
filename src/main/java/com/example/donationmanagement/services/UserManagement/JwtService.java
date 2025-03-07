@@ -41,9 +41,11 @@ public class JwtService {
                 .getBody();
         return claims.get("id", Long.class);
     }
+
     public String extractRole(String token) {
         return extractClaim(token, claims -> claims.get("role", String.class)); // 🔹 Récupérer le rôle
     }
+
 
     // Vérifier si un token est valide
     public boolean isTokenValid(String token, String username) {

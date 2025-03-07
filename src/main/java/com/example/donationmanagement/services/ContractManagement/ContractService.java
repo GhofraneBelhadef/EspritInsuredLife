@@ -152,6 +152,7 @@ public class ContractService implements IContractService {
 
 
 
+
     public boolean hasContractsForMatricule(int matriculeFiscale) {
         return !contractRepository.findByContractAccounting_MatriculeFiscale(matriculeFiscale).isEmpty();
     }
@@ -206,6 +207,7 @@ public class ContractService implements IContractService {
     }
 
 }
+
 
 
 

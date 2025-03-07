@@ -125,6 +125,7 @@ public class UserController {
     public ResponseEntity<List<User>> getAllDonors() {
         return ResponseEntity.ok(userService.getAllDonors());
     }
+
     @GetMapping("/search")
     public ResponseEntity<Page<User>> searchUsers(
             @RequestParam(required = false) String nom,
@@ -136,6 +137,7 @@ public class UserController {
             @RequestParam(defaultValue = "5") int size,
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "asc") String sortDir) {
+
 
         Sort sort = sortDir.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(page, size, sort);

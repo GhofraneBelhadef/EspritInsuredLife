@@ -25,4 +25,5 @@ public interface IUserService extends IGenericService<User, Long> {
     Optional<User> getAuthenticatedUser(HttpServletRequest request);
     Page<User> getFilteredUsers(String nom, String email, User.Role role, String telephone, Boolean active, Pageable pageable);
 
+
 }

@@ -101,6 +101,7 @@ public class ContractAccountingService implements IContractAccountingService {
         return contractAccountingRepository.findById(id).orElse(null);
     }
 
+
     @Override
     public float calculerBenefice(int matriculeFiscale) {
         ContractAccounting accounting = contractAccountingRepository.findByMatriculeFiscale(matriculeFiscale)
@@ -176,3 +177,4 @@ public class ContractAccountingService implements IContractAccountingService {
     }
 
 }
+

@@ -8,6 +8,9 @@ public interface IContractHolderService {
     Contract_Holder add (Contract_Holder contract_holder );
     Contract_Holder update(Contract_Holder contract_holder);
     void remove(long id);
+
     Contract_Holder getById(long id);
     List<Contract_Holder> getAll();
 }
+
+

@@ -225,6 +225,7 @@ public class UserService implements IUserService {
         return userRepository.findByRole(User.Role.DONOR);
     }
 
+
     public Page<User> getFilteredUsers(String nom, String email, User.Role role, String telephone, Boolean active, Pageable pageable) {
         Specification<User> spec = Specification.where(UserSpecification.hasNom(nom))
                 .and(UserSpecification.hasEmail(email))
@@ -234,4 +235,5 @@ public class UserService implements IUserService {
 
         return userRepository.findAll(spec, pageable);
     }
+
 }

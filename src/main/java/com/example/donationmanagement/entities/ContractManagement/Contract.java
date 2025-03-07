@@ -1,6 +1,10 @@
 package com.example.donationmanagement.entities.ContractManagement;
 
+
 import com.example.donationmanagement.entities.UserManagement.User;
+
+import com.example.donationmanagement.entities.DonationManagement.Donation;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
@@ -54,14 +58,21 @@ public class Contract {
     private Set<Contract_Holder> contract_holders;
     @ManyToOne
     @JoinColumn(name = "contract_accounting_id")
+
     ContractAccounting contractAccounting;
     @OneToOne(mappedBy = "contract", cascade = CascadeType.ALL)
     private ProvisionsTechniques provisionsTechniques;
     @ManyToOne
     @JoinColumn(name = "user_id")  // Cette colonne va être utilisée comme clé étrangère
     private User user;
+
+
+    @OneToMany(mappedBy = "contract", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Donation> donations; // Donations made to this contract
+
+
+    private double totalDonations; // Total donations allocated to this contract
+
 }
 
 
-
-    // Getters and setters
