@@ -38,7 +38,7 @@ public class RiskAssessment {
     @ManyToMany
     @JoinTable(
             name = "RiskA_RiskF",
-            joinColumns = @JoinColumn(name = "idAssesment"),
+            joinColumns = @JoinColumn(name = "idAssessment"),
             inverseJoinColumns = @JoinColumn(name = "idFactor")
     )
     private List<RiskFactors> RiskFactors;
