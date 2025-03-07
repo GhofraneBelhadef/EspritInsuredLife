@@ -172,8 +172,8 @@ public class RiskAssessmentService implements IRiskAssessmentService {
             uploadMedicalRecord(riskAssessment, medicalRecord);
         }
         // 🔹 Calcul et mise à jour automatique
-        // calculateRiskScore(riskAssessment.getAssessmentId());
-        //   calculatePrice(riskAssessment.getAssessmentId());
+         calculateRiskScore(riskAssessment.getAssessmentId());
+         calculatePrice(riskAssessment.getAssessmentId());
         return riskAssessmentRepository.findById(riskAssessment.getAssessmentId()).orElseThrow();
     }
     @Transactional
