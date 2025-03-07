@@ -1,5 +1,6 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\services\ContractManagement\ReportingService.java
 C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\entities\DonationManagement\WalletTransaction.java
 C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\services\ContractManagement\IContractHolderService.java
@@ -9,9 +10,57 @@ C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationman
 C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\services\RiskManagement\RiskFactorsService.java
 C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\services\ContractManagement\SinistraliteService.java
 C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\controllers\ContractManagement\SinstraliteController.java
+=======
+C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\config\SecurityConfig.java
+C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\controllers\ContractManagement\ContractAccountingController.java
+C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\controllers\ContractManagement\ContractController.java
+C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\controllers\ContractManagement\ContractHolderController.java
+C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\controllers\DonationManagement\DigitalWalletController.java
+C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\controllers\DonationManagement\DonationController.java
+C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\controllers\DonationManagement\RewardController.java
+C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\controllers\DonationManagement\WalletTransactionController.java
+C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\controllers\LoanManagement\CustomerController.java
+C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\controllers\LoanManagement\LoanController.java
+C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\controllers\LoanManagement\RiskBreakdownController.java
+C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\controllers\RiskManagement\RiskAnalysisController.java
+C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\controllers\RiskManagement\RiskAssessmentController.java
+C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\controllers\RiskManagement\RiskFactorHistoryController.java
+C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\controllers\RiskManagement\RiskFactorsController.java
+C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\controllers\UserManagement\AuthController.java
+C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\controllers\UserManagement\UserController.java
+C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\DonationManagementApplication.java
+C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\dto\RiskFactorsDTO.java
+C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\entities\ContractManagement\Contract.java
+C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\entities\ContractManagement\ContractAccounting.java
+C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\entities\ContractManagement\ContractHolder.java
+C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\entities\DonationManagement\DigitalWallet.java
+C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\entities\DonationManagement\Donation.java
+C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\entities\DonationManagement\Reward.java
+C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\entities\DonationManagement\WalletTransaction.java
+C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\entities\LoanManagement\Customer.java
+C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\entities\LoanManagement\Loan.java
+C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\entities\LoanManagement\RiskBreakdown.java
+C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\entities\RiskManagement\RiskAssessment.java
+C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\entities\RiskManagement\RiskFactorHistory.java
+C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\entities\RiskManagement\RiskFactors.java
+C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\entities\UserManagement\User.java
+C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\repositories\ContractManagement\ContractAccountingRepository.java
+>>>>>>> Risk
 C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\repositories\ContractManagement\ContractHolderRepository.java
 C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\repositories\DonationManagement\RewardRepository.java
 C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\repositories\DonationManagement\WalletTransactionRepository.java
+<<<<<<< HEAD
+=======
+C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\repositories\LoanManagement\CustomerRpository.java
+C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\repositories\LoanManagement\LoanReposity.java
+C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\repositories\LoanManagement\RiskBreakdownRepository.java
+C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\repositories\RiskManagement\RiskAssessmentRepository.java
+C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\repositories\RiskManagement\RiskFactorHistoryRepository.java
+C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\repositories\RiskManagement\RiskFactorsRepository.java
+C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\repositories\UserManagement\UserRepository.java
+C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\services\ContractManagement\ContractAccountingService.java
+C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\services\ContractManagement\ContractHolderService.java
+>>>>>>> Risk
 C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\services\ContractManagement\ContractService.java
 C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\services\RiskManagement\IRiskAssessmentService.java
 C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\DonationManagementApplication.java
@@ -57,7 +106,28 @@ C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationman
 C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\services\ContractManagement\IContractAccountingService.java
 C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\controllers\DonationManagement\RewardController.java
 C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\services\DonationManagement\RewardService.java
+<<<<<<< HEAD
 C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\repositories\DonationManagement\DigitalWalletRepository.java
+=======
+C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\services\DonationManagement\WalletTransactionService.java
+C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\services\LoanManagement\CustomerService.java
+C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\services\LoanManagement\ICustomerService.java
+C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\services\LoanManagement\ILoanService.java
+C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\services\LoanManagement\IRiskBreakdownService.java
+C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\services\LoanManagement\LoanService.java
+C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\services\LoanManagement\RiskBreakdownService.java
+C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\services\RiskManagement\IRiskAssessmentService.java
+C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\services\RiskManagement\IRiskFactorHistoryService.java
+C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\services\RiskManagement\IRiskFactorsService.java
+C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\services\RiskManagement\RiskAnalysisService.java
+C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\services\RiskManagement\RiskAssessmentService.java
+C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\services\RiskManagement\RiskFactorHistoryService.java
+C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\services\RiskManagement\RiskFactorsService.java
+C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\services\RiskManagement\TwilioService.java
+C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\services\UserManagement\IJwtService.java
+C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\services\UserManagement\IUserService.java
+C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\services\UserManagement\JwtService.java
+>>>>>>> Risk
 C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\services\UserManagement\UserService.java
 C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\services\UserManagement\JwtService.java
 C:\Users\HP\IdeaProjects\EspritInsuredLife\src\main\java\com\example\donationmanagement\entities\ContractManagement\MortalityTable.java
