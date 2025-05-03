@@ -23,6 +23,6 @@ public interface IUserService extends IGenericService<User, Long> {
     // ✅ Réinitialisation du mot de passe avec token
     ResponseEntity<String> resetPassword(String token, String newPassword);
     Optional<User> getAuthenticatedUser(HttpServletRequest request);
-    Page<User> getFilteredUsers(String nom, String email, User.Role role, String telephone, Boolean active, Pageable pageable);
+    Page<User> getFilteredUsers(String nom, String email,String username, User.Role role, String telephone, Boolean active, Pageable pageable);
 
 }

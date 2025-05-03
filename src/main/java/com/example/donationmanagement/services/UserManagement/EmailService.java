@@ -53,4 +53,27 @@ public class EmailService {
 
         mailSender.send(message);
     }
+    public void sendLoginFailureAlert(String to, String nom) {
+        String subject = "Alerte de sécurité - Tentatives de connexion échouées";
+        String content = "<p>Bonjour " + nom + ",</p>"
+                + "<p>Nous avons détecté 3 tentatives de connexion échouées à votre compte.</p>"
+                + "<p>Si ce n'était pas vous, nous vous recommandons de changer votre mot de passe immédiatement.</p>"
+                + "<p>Si c'était vous, veuillez vérifier que vous utilisez le bon mot de passe.</p>"
+                + "<br><p>Cordialement,<br>L’équipe Sécurité</p>";
+
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+            helper.setTo(to);
+            helper.setSubject(subject);
+            helper.setText(content, true);
+
+            mailSender.send(message);
+            System.out.println("⚠️ Alerte de tentative échouée envoyée à " + to);
+        } catch (MessagingException e) {
+            System.err.println("Erreur lors de l'envoi de l'alerte : " + e.getMessage());
+            throw new RuntimeException("Erreur lors de l'envoi de l'email d'alerte", e);
+        }
+    }
+
 }
