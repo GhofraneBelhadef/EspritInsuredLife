@@ -29,7 +29,7 @@ public class RiskAssessmentService implements IRiskAssessmentService {
 
     private final RiskAssessmentRepository riskAssessmentRepository;
     private final RiskFactorsRepository riskFactorsRepository;
-    private static final String UPLOAD_DIR = "C:/Users/HP/Downloads/";
+    private static final String UPLOAD_DIR = "C:\\Users\\PC\\Downloads";
     @Autowired
     private RiskFactorHistoryService riskFactorHistoryService;
     @Autowired
