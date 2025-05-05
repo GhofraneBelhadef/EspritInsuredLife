@@ -1,5 +1,4 @@
 package com.example.donationmanagement.entities.UserManagement;
-
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;

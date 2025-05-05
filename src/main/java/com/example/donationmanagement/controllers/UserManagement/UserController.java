@@ -1,5 +1,4 @@
 package com.example.donationmanagement.controllers.UserManagement;
-
 import com.example.donationmanagement.entities.UserManagement.User;
 import com.example.donationmanagement.repositories.UserManagement.UserRepository;
 import com.example.donationmanagement.services.UserManagement.IUserService;
@@ -17,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 
@@ -63,6 +63,20 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Accès refusé !");
         }
     }
+    @PutMapping("/{id}/photo")
+    public ResponseEntity<User> updatePhoto(@PathVariable Long id, @RequestParam("photo") MultipartFile photo) throws IOException {
+        Optional<User> userOpt = userRepository.findById(id);
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            user.setPhotoProfil(photo.getBytes());  // Pass the byte[] directly
+            userRepository.save(user);
+            return ResponseEntity.ok(user);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable Long id, HttpServletRequest request) {
@@ -70,6 +84,8 @@ public class UserController {
 
         if (authenticatedUser.isPresent()) {
             User user = authenticatedUser.get();
+            System.out.println("ID connecté: " + user.getId() + ", rôle: " + user.getRole());
+
 
             // Vérifie si l'utilisateur est ADMIN ou s'il essaie de supprimer son propre compte
             if (user.getRole().equals("ADMIN") || user.getId().equals(id)) {
@@ -81,6 +97,7 @@ public class UserController {
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Utilisateur non authentifié !");
         }
+
     }
     @PutMapping("/complete-profile/{email}")
     public ResponseEntity<String> completeUserProfile(
@@ -125,11 +142,11 @@ public class UserController {
     public ResponseEntity<List<User>> getAllDonors() {
         return ResponseEntity.ok(userService.getAllDonors());
     }
-
     @GetMapping("/search")
     public ResponseEntity<Page<User>> searchUsers(
             @RequestParam(required = false) String nom,
             @RequestParam(required = false) String email,
+            @RequestParam(required = false) String username,
             @RequestParam(required = false) User.Role role,
             @RequestParam(required = false) String telephone,
             @RequestParam(required = false) Boolean active,
@@ -138,11 +155,21 @@ public class UserController {
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "asc") String sortDir) {
 
-
         Sort sort = sortDir.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(page, size, sort);
-        Page<User> users = userService.getFilteredUsers(nom, email, role, telephone, active, pageable);
+        Page<User> users = userService.getFilteredUsers(nom, email,username, role, telephone, active, pageable);
         return ResponseEntity.ok(users);
     }
+    @GetMapping("/profile")
+    public ResponseEntity<User> getAuthenticatedUserProfile(HttpServletRequest request) {
+        Optional<User> user = userService.getAuthenticatedUser(request);
+        if (user.isPresent()) {
+            return ResponseEntity.ok(user.get());
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+    }
+
+
 
 }

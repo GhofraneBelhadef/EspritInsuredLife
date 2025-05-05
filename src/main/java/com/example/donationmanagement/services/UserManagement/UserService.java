@@ -14,8 +14,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -24,6 +27,7 @@ public class UserService implements IUserService {
 
     @Autowired
     private UserRepository userRepository;
+    private final Map<String, Integer> loginFailures = new ConcurrentHashMap<>();
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -113,11 +117,25 @@ public class UserService implements IUserService {
     @Override
     public Optional<String> login(String email, String password) {
         Optional<User> user = userRepository.findByEmail(email);
+
         if (user.isPresent() && passwordEncoder.matches(password, user.get().getPassword())) {
-            String token = jwtService.generateToken(user.get()); // ✅ Passe l'objet `User`
+            // Réinitialise le compteur en cas de succès
+            loginFailures.remove(email);
+            String token = jwtService.generateToken(user.get());
             return Optional.of(token);
+        } else {
+            // Incrémente le compteur
+            loginFailures.merge(email, 1, Integer::sum);
+            int failures = loginFailures.get(email);
+
+            if (failures >= 3 && user.isPresent()) {
+                // Envoie un email d'alerte
+                emailService.sendLoginFailureAlert(user.get().getEmail(), user.get().getNom());
+                loginFailures.remove(email); // Réinitialise après envoi
+            }
+
+            return Optional.empty();
         }
-        return Optional.empty();
     }
 
     // ✅ 4️⃣ CRUD hérité de `IGenericService`
@@ -179,7 +197,7 @@ public class UserService implements IUserService {
         userRepository.save(user.get());
 
         // ✅ Construire le lien de réinitialisation
-        String resetLink = "http://localhost:9090/api/auth/reset-password?token=" + resetToken;
+        String resetLink = "http://localhost:4200/reset-password?token=" + resetToken;
 
         // ✅ Envoyer l'email avec le lien
         try {
@@ -225,15 +243,14 @@ public class UserService implements IUserService {
         return userRepository.findByRole(User.Role.DONOR);
     }
 
-
-    public Page<User> getFilteredUsers(String nom, String email, User.Role role, String telephone, Boolean active, Pageable pageable) {
+    public Page<User> getFilteredUsers(String nom, String email,String username, User.Role role, String telephone, Boolean active, Pageable pageable) {
         Specification<User> spec = Specification.where(UserSpecification.hasNom(nom))
                 .and(UserSpecification.hasEmail(email))
+                .and(UserSpecification.hasUsername(username))
                 .and(UserSpecification.hasRole(role))
                 .and(UserSpecification.hasTelephone(telephone))
                 .and(UserSpecification.isActive(active));
 
         return userRepository.findAll(spec, pageable);
     }
-
 }

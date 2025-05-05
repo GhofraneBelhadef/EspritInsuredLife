@@ -20,8 +20,6 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
     Optional<User> findByTelephone(String telephone);
     Optional<User> findByGoogleId(String googleId);
     List<User> findByRole(User.Role role);
-
-    Optional<User> getById(long id);  // Récupérer par ID
-
+    Page<User> findAll(Pageable pageable);
 
 }

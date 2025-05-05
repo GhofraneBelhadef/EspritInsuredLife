@@ -68,6 +68,7 @@ public class AuthController {
         try {
             // 🛠️ **Convertir `userJson` en Objet `User`**
             User user = objectMapper.readValue(userJson, User.class);
+            user.setRole(User.Role.CLIENT);
 
             // 🛠️ **Vérifier les contraintes de validation**
             Set<ConstraintViolation<User>> violations = validator.validate(user);
