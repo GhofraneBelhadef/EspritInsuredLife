@@ -8,6 +8,7 @@ import com.example.donationmanagement.entities.DonationManagement.Donation;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
@@ -47,6 +48,7 @@ public class Contract {
     private Category_contract category_contract;
     @NotNull(message = "La date de début de la police est requise.")
     @Past(message = "La date de début de la police ne peut pas être dans le futur.")
+    @JsonProperty("Policy_inception_date")
     private Date Policy_inception_date;
     @NotNull(message = "La date d'expiration est requise.")
     @Future(message = "La date d'expiration doit être dans le futur.")
@@ -67,14 +69,10 @@ public class Contract {
     @OneToOne(mappedBy = "contract", cascade = CascadeType.ALL)
     @JsonManagedReference("contract-provision")
     private ProvisionsTechniques provisionsTechniques;
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
     @JsonIgnore
-    @ManyToOne
     @JoinColumn(name = "user_id")  // Cette colonne va être utilisée comme clé étrangère
     private User user;
-
-    @JsonIgnore
-    @OneToMany(mappedBy = "contract", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Donation> donations; // Donations made to this contract
 
 
     private double totalDonations; // Total donations allocated to this contract

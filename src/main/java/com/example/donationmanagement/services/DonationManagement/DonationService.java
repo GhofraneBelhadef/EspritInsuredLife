@@ -154,13 +154,9 @@ public class DonationService implements IDonationService {
                 .orElseThrow(() -> new RuntimeException("Contract not found with id: " + contractId));
 
         // Initialiser la collection des donations si elle est null
-        if (contract.getDonations() == null) {
-            contract.setDonations(new HashSet<>());
-        }
 
         // Ajouter la donation au contrat
-        contract.getDonations().add(donation);
-        contract.setTotalDonations(contract.getTotalDonations() + donation.getDonation_amount()); // Mettre à jour le total des donations
+      // Mettre à jour le total des donations
 
         // Sauvegarder le contrat mis à jour
         contractRepo.save(contract);
