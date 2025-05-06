@@ -1,5 +1,6 @@
 package com.example.donationmanagement.entities.ContractManagement;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
@@ -41,8 +42,10 @@ public class ContractAccounting {
     private float totalProvisions;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "contractAccounting")
+    @JsonManagedReference(value = "accounting-contract")
     private Set<Contract> contracts;
     @OneToMany(mappedBy = "contractAccounting", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference("accounting-provision")
     private List<ProvisionsTechniques> provisionsTechniques;
     public void updateTotalCapital() {
         if (contracts != null) {

@@ -46,7 +46,7 @@ public class SecurityConfig {
                         ).permitAll()
 
                         // Autoriser les routes publiques
-                        .requestMatchers("/api/auth/**", "/RiskAssessment/**","/risk/**","/api/risk-factors/history/**","/RiskFactors/**","/campaigns/**","/digital-wallets/**","/donations/**","/rewards/**","/api/social-media/**","/wallet-transactions/**","/contractAccounting/**","/contracts/**","/contractHolders/**","/api/mortality/**","/api/provisions/**","/api/reports/**","/sinistralite/**","/complaints/**","/notifications/**","/oauth2/**").permitAll()
+                        .requestMatchers("/api/auth/**", "/RiskAssessment/**","/risk/**","/api/risk-factors/history/**","/RiskFactors/**","/campaigns/**","/digital-wallets/**","/donations/**","/rewards/**","/api/social-media/**","/wallet-transactions/**","/contractAccounting/**","/contractHolders/**","/api/mortality/**","/api/provisions/**","/api/reports/**","/sinistralite/**","/complaints/**","/notifications/**","/oauth2/**").permitAll()
 
                         // Protéger toutes les autres routes
                         .anyRequest().authenticated()

@@ -137,4 +137,14 @@ public class ContractAccountingController {
         // Retourner la valeur mise à jour
         return ResponseEntity.ok(accounting.getTotalProvisions());
     }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteContractAccounting(@PathVariable Long id) {
+        try {
+            contractAccountingService.deleteContractAccounting(id);
+            return ResponseEntity.ok("ContractAccounting supprimé avec succès.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Erreur lors de la suppression : " + e.getMessage());
+        }
+    }
 }

@@ -1,4 +1,5 @@
 package com.example.donationmanagement.entities.ContractManagement;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -29,6 +30,7 @@ public class Contract_Holder {
     private  Status status;
     @ManyToOne
     @JoinColumn(name = "contract_id")
+    @JsonBackReference("contract-holder")
     Contract contract;
 
 

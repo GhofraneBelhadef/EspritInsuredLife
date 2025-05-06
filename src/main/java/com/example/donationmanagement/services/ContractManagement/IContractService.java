@@ -13,6 +13,7 @@ public interface IContractService {
     Contract getById(long id);
     List<Contract> getAll();
     Page<Contract> getAllContracts(int page, int size);
-
+    List<Contract> getContractsByUserId(Long userId);
+    String cancelContract(Long contractId);
 
 }

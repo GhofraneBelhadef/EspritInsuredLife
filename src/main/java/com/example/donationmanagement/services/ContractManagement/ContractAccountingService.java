@@ -175,6 +175,31 @@ public class ContractAccountingService implements IContractAccountingService {
 
         return montant;
     }
+    @Override
+    public void deleteContractAccounting(Long id) {
+        ContractAccounting contractAccounting = contractAccountingRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("ContractAccounting non trouvé avec l'ID: " + id));
+
+        // Supprimer les contrats liés
+        if (contractAccounting.getContracts() != null) {
+            contractAccounting.getContracts().forEach(contract -> {
+                contract.setContractAccounting(null);  // Dissocier le contrat de l'entité ContractAccounting
+                contractRepository.save(contract); // Sauvegarder le contrat après la dissociation
+            });
+        }
+
+        // Supprimer les provisions techniques liées
+        if (contractAccounting.getProvisionsTechniques() != null) {
+            contractAccounting.getProvisionsTechniques().forEach(provision -> {
+                provision.setContractAccounting(null); // Dissocier la provision
+            });
+        }
+
+        // Supprimer l'entité ContractAccounting
+        contractAccountingRepository.delete(contractAccounting);
+
+        log.info("ContractAccounting avec ID {} a été supprimé.", id);
+    }
 
 }
 

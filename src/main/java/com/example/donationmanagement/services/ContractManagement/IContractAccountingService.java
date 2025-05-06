@@ -23,7 +23,7 @@ public interface IContractAccountingService {
     float calculerBenefice(int matriculeFiscale); // ✅ Vérifie bien ce type de retour
     float calculerBeneficeTotal();
     void updateTotalProvisions(ContractAccounting accounting);
-
+    void deleteContractAccounting(Long id);
 
 }
 

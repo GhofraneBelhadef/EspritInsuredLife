@@ -124,5 +124,19 @@ public class ContractController {
         Page<Contract> contracts = contractService.getAllContracts(page, size);
         return ResponseEntity.ok(contracts);  // Retourne la page des contrats
     }
+    @GetMapping("/user/{userId}")
+    public List<Contract> getContractsByUser(@PathVariable Long userId) {
+        return contractService.getContractsByUserId(userId);
+    }
+    @PutMapping("/cancel/{id}")
+    public ResponseEntity<String> cancelContract(@PathVariable Long id) {
+        try {
+            String result = contractService.cancelContract(id);
+            return ResponseEntity.ok(result);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(404).body(e.getMessage());
+        }
+    }
+
 
 }

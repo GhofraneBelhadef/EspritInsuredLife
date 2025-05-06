@@ -5,6 +5,9 @@ import com.example.donationmanagement.entities.UserManagement.User;
 
 import com.example.donationmanagement.entities.DonationManagement.Donation;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
@@ -54,19 +57,22 @@ public class Contract {
     @Enumerated(EnumType.STRING)
     @NotNull(message = "Le statut du contrat est requis.")
     private  Status status;
-    @OneToMany (cascade = CascadeType.ALL, mappedBy = "contract")
+    @OneToMany(mappedBy = "contract", cascade = CascadeType.ALL)
+    @JsonManagedReference("contract-holder")
     private Set<Contract_Holder> contract_holders;
     @ManyToOne
     @JoinColumn(name = "contract_accounting_id")
-
+    @JsonBackReference(value = "accounting-contract")
     ContractAccounting contractAccounting;
     @OneToOne(mappedBy = "contract", cascade = CascadeType.ALL)
+    @JsonManagedReference("contract-provision")
     private ProvisionsTechniques provisionsTechniques;
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "user_id")  // Cette colonne va être utilisée comme clé étrangère
     private User user;
 
-
+    @JsonIgnore
     @OneToMany(mappedBy = "contract", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Donation> donations; // Donations made to this contract
 

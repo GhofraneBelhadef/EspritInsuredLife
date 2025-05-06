@@ -205,6 +205,21 @@ public class ContractService implements IContractService {
         Pageable pageable = PageRequest.of(page, size);  // Créer un objet Pageable pour la pagination
         return contractRepository.findAll(pageable);  // Retourne une page de contrats
     }
+    @Override
+    public List<Contract> getContractsByUserId(Long userId) {
+        return contractRepository.findByUserId(userId);
+    }
+    public String cancelContract(Long contractId) {
+        Optional<Contract> optionalContract = contractRepository.findById(contractId);
+        if (optionalContract.isPresent()) {
+            Contract contract = optionalContract.get();
+            contract.setStatus(Contract.Status.Resillied);  // Met à jour le statut du contrat pour l'annuler
+            contractRepository.save(contract);  // Sauvegarde les changements dans la base de données
+            return "Contract has been canceled successfully.";
+        } else {
+            throw new RuntimeException("Contract not found");
+        }
+    }
 
 }
 
