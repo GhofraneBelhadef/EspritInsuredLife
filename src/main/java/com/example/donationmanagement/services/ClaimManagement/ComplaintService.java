@@ -4,6 +4,7 @@ import com.example.donationmanagement.entities.ClaimManagement.Notification;
 import com.example.donationmanagement.entities.ClaimManagement.Complaint;
 import com.example.donationmanagement.repositories.ClaimManagement.ComplaintRepository;
 import com.example.donationmanagement.repositories.ClaimManagement.NotificationRepository;
+import org.springframework.http.*;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -12,10 +13,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
 import java.time.LocalDateTime;
 import java.util.List;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import java.util.HashMap;
@@ -31,11 +29,12 @@ public class ComplaintService {
     private final String predictionApiUrl = "http://localhost:5000/prediction";
     private final ComplaintRepository complaintRepository;
     private final NotificationRepository notificationRepository;
-
-    public ComplaintService(ComplaintRepository complaintRepository, NotificationRepository notificationRepository, RestTemplate restTemplate) {
+    private  SimpMessagingTemplate messagingTemplate ;
+    public ComplaintService(ComplaintRepository complaintRepository, NotificationRepository notificationRepository, RestTemplate restTemplate, SimpMessagingTemplate messagingTemplate) {
         this.complaintRepository = complaintRepository;
         this.notificationRepository = notificationRepository;
         this.restTemplate = restTemplate;
+        this.messagingTemplate = messagingTemplate;
     }
 
     public List<Complaint> getAllComplaints() {
@@ -48,7 +47,7 @@ public class ComplaintService {
     }
 
 
-    public Complaint createComplaint(Complaint complaint) {
+    /*public Complaint createComplaint(Complaint complaint) {
         return complaintRepository.save(complaint);
     }
 
@@ -62,7 +61,41 @@ public class ComplaintService {
             return complaintRepository.save(complaint);
         }
         return null;
+    }*/public Complaint createComplaint(Complaint complaint) {
+        Complaint saved = complaintRepository.save(complaint);
+
+        Notification notification = new Notification();
+        notification.setComplaint(saved);
+        notification.setMessage("New complaint created: #" + saved.getId());
+        notification.setTimestamp(LocalDateTime.now());
+        notification.setRead(false);
+        notificationRepository.save(notification);
+
+        messagingTemplate.convertAndSend("/topic/notifications", notification);
+
+        return saved;
     }
+
+    public Complaint updateComplaint(Long id, Complaint updatedData) {
+        Complaint complaint = getComplaintById(id);
+        complaint.setDescription(updatedData.getDescription());
+        complaint.setStatus(updatedData.getStatus());
+        complaint.setContractId(updatedData.getContractId());
+        complaint.setClaimAmount(updatedData.getClaimAmount());
+        Complaint updated = complaintRepository.save(complaint);
+
+        Notification notification = new Notification();
+        notification.setComplaint(updated);
+        notification.setMessage("Complaint updated: #" + updated.getId());
+        notification.setTimestamp(LocalDateTime.now());
+        notification.setRead(false);
+        notificationRepository.save(notification);
+
+        messagingTemplate.convertAndSend("/topic/notifications", notification);
+
+        return updated;
+    }
+
 
     public void deleteComplaint(Long id) {
         if (!complaintRepository.existsById(id)) {
@@ -86,17 +119,66 @@ public class ComplaintService {
         Pageable pageable = PageRequest.of(page, size);
         return complaintRepository.findAll(pageable);
     }
-    public Object getPrediction(List<Object> features) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
+    public Object getPrediction(Object[] features) {
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
 
-        Map<String, Object> requestBody = new HashMap<>();
-        requestBody.put("features", features);
+            HttpEntity<Object[]> requestEntity = new HttpEntity<>(features, headers);
 
-        HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
+            ResponseEntity<Object> response = restTemplate.exchange(
+                    "http://127.0.0.1:5000/predict",
+                    HttpMethod.POST,
+                    requestEntity,
+                    Object.class
+            );
 
-        ResponseEntity<Map> response = restTemplate.postForEntity(predictionApiUrl, requestEntity, Map.class);
-        return response.getBody().get("prediction");
+            return response.getBody();
+        } catch (Exception e) {
+            System.out.println("Error while fetching prediction: " + e.getMessage());
+            return "Error while getting prediction: " + e.getMessage();
+        }
     }
+    public String recommendSolution(Long complaintId) {
+        try {
+            // Vérifier si la réclamation existe
+            Complaint complaint = getComplaintById(complaintId);
+            if (complaint == null) {
+                throw new RuntimeException("Réclamation introuvable avec l'ID : " + complaintId);
+            }
 
+            // URL de l'API Flask avec complaintId dans l'URL
+            String flaskUrl = "http://localhost:5000/recommend/" + complaintId;
+
+            // Définir les en-têtes
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            // Créer une requête vide, car Flask prend l'ID dans l'URL
+            HttpEntity<String> requestEntity = new HttpEntity<>(headers);
+
+            // Envoi de la requête au service Flask
+            ResponseEntity<Map> response = restTemplate.exchange(
+                    flaskUrl, HttpMethod.POST, requestEntity, Map.class);
+
+            // Vérification du statut de la réponse
+            if (response.getStatusCode() == HttpStatus.OK) {
+                // Extraire la solution recommandée de la réponse
+                Map<String, Object> responseBody = response.getBody();
+                String recommendedSolution = (String) responseBody.get("recommended_solution");
+
+                if (recommendedSolution != null) {
+                    return recommendedSolution;
+                } else {
+                    throw new RuntimeException("La solution recommandée est absente de la réponse.");
+                }
+            } else {
+                throw new RuntimeException("Échec de la récupération de la solution. Code de statut : " + response.getStatusCode());
+            }
+        } catch (Exception e) {
+            // Gestion des erreurs
+            return "Erreur lors de la récupération de la solution : " + e.getMessage();
+        }
+
+    }
 }
